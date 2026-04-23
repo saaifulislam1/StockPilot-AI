@@ -31,18 +31,36 @@ export function getTone(status: string) {
   const lower = status.toLowerCase();
 
   if (lower.includes("error") || lower.includes("loss") || lower.includes("danger")) {
-    return "border-rose-500/15 bg-rose-500/10 text-rose-700 dark:text-rose-300";
+    return "border-rose-500/15 bg-rose-500/10";
   }
 
   if (lower.includes("wait") || lower.includes("thin") || lower.includes("cautious")) {
-    return "border-amber-500/15 bg-amber-500/10 text-amber-700 dark:text-amber-300";
+    return "border-amber-500/15 bg-amber-500/10";
   }
 
   if (lower.includes("need")) {
-    return "border-amber-500/15 bg-amber-500/10 text-amber-700 dark:text-amber-300";
+    return "border-amber-500/15 bg-amber-500/10";
   }
 
-  return "border-emerald-500/30 bg-emerald-500/14 text-emerald-800 dark:text-emerald-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]";
+  return "border-emerald-500/40 bg-emerald-500/14 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]";
+}
+
+export function getToneTextStyle(status: string): React.CSSProperties {
+  const lower = status.toLowerCase();
+
+  if (lower.includes("error") || lower.includes("loss") || lower.includes("danger")) {
+    return { color: "#111111" };
+  }
+
+  if (lower.includes("wait") || lower.includes("thin") || lower.includes("cautious")) {
+    return { color: "#111111" };
+  }
+
+  if (lower.includes("need")) {
+    return { color: "#111111" };
+  }
+
+  return { color: "#ffffff" };
 }
 
 export function ShellCard({

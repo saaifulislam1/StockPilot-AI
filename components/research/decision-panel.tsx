@@ -6,6 +6,7 @@ import {
   formatCurrency,
   formatPercent,
   getTone,
+  getToneTextStyle,
 } from "@/components/research/ui";
 import { type CompetitorEntry, getAdjustedPrice } from "@/lib/product-research";
 
@@ -185,7 +186,10 @@ export function DecisionPanel({
                 later from Saved Products.
               </p>
             </div>
-            <span className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(saveStatus)}`}>
+            <span
+              className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(saveStatus)}`}
+              style={getToneTextStyle(saveStatus)}
+            >
               {saveStatus}
             </span>
           </div>
@@ -303,7 +307,10 @@ export function DecisionPanel({
                       research.
                     </p>
                   </div>
-                  <span className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(model.pricing.profitStatus)}`}>
+                  <span
+                    className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(model.pricing.profitStatus)}`}
+                    style={getToneTextStyle(model.pricing.profitStatus)}
+                  >
                     {model.pricing.profitStatus}
                   </span>
                 </div>
@@ -357,10 +364,16 @@ export function DecisionPanel({
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <span className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(model.pricing.breakEvenAlert)}`}>
+                  <span
+                    className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(model.pricing.breakEvenAlert)}`}
+                    style={getToneTextStyle(model.pricing.breakEvenAlert)}
+                  >
                     {model.pricing.breakEvenAlert}
                   </span>
-                  <span className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(model.pricing.restockDecision)}`}>
+                  <span
+                    className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(model.pricing.restockDecision)}`}
+                    style={getToneTextStyle(model.pricing.restockDecision)}
+                  >
                     {model.pricing.restockDecision}
                   </span>
                 </div>
@@ -660,6 +673,7 @@ export function DecisionPanel({
                         className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(
                           scenario.verdict,
                         )}`}
+                        style={getToneTextStyle(scenario.verdict)}
                       >
                         {scenario.verdict}
                       </span>
