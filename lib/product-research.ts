@@ -4,6 +4,7 @@ export type ProductInputs = {
   productName: string;
   supplier: string;
   buyingCostPerUnit: number;
+  transportationCostToHome: number;
   unitsBought: number;
   deliveryCostPerOrder: number;
   packagingCostPerOrder: number;
@@ -59,6 +60,7 @@ export const fallbackDataset: ResearchDataset = {
     productName: "Mini Multi Cooker",
     supplier: "Example supplier",
     buyingCostPerUnit: 1100,
+    transportationCostToHome: 0,
     unitsBought: 20,
     deliveryCostPerOrder: 120,
     packagingCostPerOrder: 30,
@@ -90,6 +92,25 @@ export function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+export function normalizeProductInputs(
+  product: Partial<ProductInputs>,
+): ProductInputs {
+  return {
+    productName: product.productName ?? "",
+    supplier: product.supplier ?? "",
+    buyingCostPerUnit: product.buyingCostPerUnit ?? 0,
+    transportationCostToHome: product.transportationCostToHome ?? 0,
+    unitsBought: product.unitsBought ?? 0,
+    deliveryCostPerOrder: product.deliveryCostPerOrder ?? 0,
+    packagingCostPerOrder: product.packagingCostPerOrder ?? 0,
+    averageAdCostPerOrder: product.averageAdCostPerOrder ?? 0,
+    failedOrderRate: product.failedOrderRate ?? 0,
+    returnLossPerFailedOrder: product.returnLossPerFailedOrder ?? 0,
+    targetNetProfitPerOrder: product.targetNetProfitPerOrder ?? 0,
+    manualTargetSellPrice: product.manualTargetSellPrice ?? 0,
+  };
+}
+
 export const DEFAULT_COMPETITOR_DELIVERY_FEE = 70;
 
 function average(values: number[]) {
@@ -117,7 +138,7 @@ export function computeResearchModel(
   dataset: Pick<ResearchDataset, "product" | "competitors" | "salesLog">,
   scenarioUnitsSold?: number,
 ) {
-  const product = dataset.product;
+  const product = normalizeProductInputs(dataset.product);
   const competitors = dataset.competitors.filter((entry) => entry.listedPrice > 0);
   const salesLog = dataset.salesLog;
 
@@ -141,8 +162,13 @@ export function computeResearchModel(
   const facebookAveragePrice = roundCurrency(average(facebookPrices));
   const facebookPremiumOverWeb = facebookAveragePrice - websiteAveragePrice;
 
+  const transportCostPerUnit =
+    product.unitsBought > 0
+      ? product.transportationCostToHome / product.unitsBought
+      : 0;
   const baseLandedCostPerOrder =
     product.buyingCostPerUnit +
+    transportCostPerUnit +
     product.deliveryCostPerOrder +
     product.packagingCostPerOrder +
     product.averageAdCostPerOrder;
@@ -158,6 +184,7 @@ export function computeResearchModel(
   const idealBuyingCostAtMarketAverage =
     hasMarketAverage
       ? averageCompetitorPrice -
+        transportCostPerUnit -
         product.deliveryCostPerOrder -
         product.packagingCostPerOrder -
         product.averageAdCostPerOrder -
@@ -167,6 +194,7 @@ export function computeResearchModel(
   const maxSafeBuyingCost =
     hasMarketAverage
       ? averageCompetitorPrice -
+        transportCostPerUnit -
         product.deliveryCostPerOrder -
         product.packagingCostPerOrder -
         product.averageAdCostPerOrder -
@@ -186,8 +214,11 @@ export function computeResearchModel(
     product.averageAdCostPerOrder * product.unitsBought;
   const totalPackagingCostNeeded =
     product.packagingCostPerOrder * product.unitsBought;
+  const totalTransportationCostNeeded = product.transportationCostToHome;
+  const totalSourcingCost =
+    totalCapitalInvested + totalTransportationCostNeeded;
   const totalCashNeeded =
-    totalCapitalInvested + totalAdBudgetNeeded + totalPackagingCostNeeded;
+    totalSourcingCost + totalAdBudgetNeeded + totalPackagingCostNeeded;
   const expectedFailedOrders = Math.round(product.unitsBought * product.failedOrderRate);
   const expectedReturnLossReserve =
     expectedFailedOrders *
@@ -199,7 +230,7 @@ export function computeResearchModel(
   const targetRevenueAtRecommendedPrice =
     recommendedSellPrice * product.unitsBought;
   const roiThisBatch =
-    totalCapitalInvested > 0 ? projectedTotalProfit / totalCapitalInvested : 0;
+    totalSourcingCost > 0 ? projectedTotalProfit / totalSourcingCost : 0;
 
   const unitsActuallySold = clamp(
     roundCurrency(scenarioUnitsSold ?? Math.min(16, product.unitsBought)),
@@ -215,7 +246,7 @@ export function computeResearchModel(
   const stillNeedToSell = product.unitsBought - unitsActuallySold;
   const minUnitsToSellToBreakEven =
     recommendedSellPrice > 0
-      ? Math.ceil(totalCapitalInvested / recommendedSellPrice)
+      ? Math.ceil(totalSourcingCost / recommendedSellPrice)
       : 0;
   const breakEvenRevenueAtUnitTarget =
     minUnitsToSellToBreakEven * recommendedSellPrice;
@@ -312,6 +343,7 @@ export function computeResearchModel(
   const strategyBoard = strategyScenarios.map((scenario) => {
     const scenarioBaseLandedCost =
       scenario.buyCostPerUnit +
+      transportCostPerUnit +
       product.deliveryCostPerOrder +
       product.packagingCostPerOrder +
       product.averageAdCostPerOrder;
@@ -357,6 +389,7 @@ export function computeResearchModel(
     },
     pricing: {
       baseLandedCostPerOrder,
+      transportCostPerUnit,
       failedOrderCostSpread,
       trueCostPerSuccessfulOrder,
       breakEvenSellPrice,
@@ -378,6 +411,7 @@ export function computeResearchModel(
       totalCapitalInvested,
       totalAdBudgetNeeded,
       totalPackagingCostNeeded,
+      totalTransportationCostNeeded,
       totalCashNeeded,
       expectedFailedOrders,
       expectedReturnLossReserve,

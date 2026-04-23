@@ -202,6 +202,10 @@ export function DecisionPanel({
           <div className="mt-3 overflow-hidden rounded-[1rem] border border-[var(--border)]">
             {[
               ["Total capital invested", ready(model.cashflow.totalCapitalInvested, hasData)],
+              [
+                "Transport from market to home",
+                ready(model.cashflow.totalTransportationCostNeeded, hasData),
+              ],
               ["Total ad budget needed", ready(model.cashflow.totalAdBudgetNeeded, hasData)],
               ["Total packaging cost", ready(model.cashflow.totalPackagingCostNeeded, hasData)],
             ].map(([label, value], index) => (
@@ -564,6 +568,10 @@ export function DecisionPanel({
                       value: ready(model.pricing.baseLandedCostPerOrder, hasData),
                     },
                     {
+                      label: "Transport cost per unit",
+                      value: ready(model.pricing.transportCostPerUnit, hasData),
+                    },
+                    {
                       label: "Failed order cost spread",
                       value: ready(model.pricing.failedOrderCostSpread, hasData),
                     },
@@ -614,6 +622,10 @@ export function DecisionPanel({
                     {
                       label: "Total ad budget needed",
                       value: ready(model.cashflow.totalAdBudgetNeeded, hasData),
+                    },
+                    {
+                      label: "Transport cost to home",
+                      value: ready(model.cashflow.totalTransportationCostNeeded, hasData),
                     },
                     {
                       label: "Total cash needed",

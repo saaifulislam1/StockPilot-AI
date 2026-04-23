@@ -23,6 +23,7 @@ import {
   type ProductInputs,
   type ResearchDataset,
   computeResearchModel,
+  normalizeProductInputs,
   normalizeLinks,
 } from "@/lib/product-research";
 
@@ -65,6 +66,10 @@ function ensureCompetitorIds(entries: CompetitorEntry[]) {
 function createProductFieldDrafts(product: ProductInputs): ProductFieldDrafts {
   return {
     buyingCostPerUnit: String(product.buyingCostPerUnit),
+    transportationCostToHome:
+      product.transportationCostToHome > 0
+        ? String(product.transportationCostToHome)
+        : "",
     unitsBought: String(product.unitsBought),
     deliveryCostPerOrder: String(product.deliveryCostPerOrder),
     packagingCostPerOrder: String(product.packagingCostPerOrder),
@@ -167,20 +172,24 @@ export function ResearchEditor({
   researchId,
 }: ResearchEditorProps) {
   const router = useRouter();
+  const initialProduct = useMemo(
+    () => normalizeProductInputs(initialDataset.product),
+    [initialDataset.product],
+  );
   const [isEditing, setIsEditing] = useState(mode === "create");
   const [step, setStep] = useState<ResearchStep>(
     mode === "create" ? "inputs" : "analysis",
   );
-  const [product, setProduct] = useState<ProductInputs>(initialDataset.product);
+  const [product, setProduct] = useState<ProductInputs>(initialProduct);
   const [productDrafts, setProductDrafts] = useState<ProductFieldDrafts>(
-    createProductFieldDrafts(initialDataset.product),
+    createProductFieldDrafts(initialProduct),
   );
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>(
     ensureCompetitorIds(initialDataset.competitors),
   );
-  const [savedProduct, setSavedProduct] = useState<ProductInputs>(initialDataset.product);
+  const [savedProduct, setSavedProduct] = useState<ProductInputs>(initialProduct);
   const [savedProductDrafts, setSavedProductDrafts] = useState<ProductFieldDrafts>(
-    createProductFieldDrafts(initialDataset.product),
+    createProductFieldDrafts(initialProduct),
   );
   const [savedCompetitors, setSavedCompetitors] = useState<CompetitorEntry[]>(
     ensureCompetitorIds(initialDataset.competitors),

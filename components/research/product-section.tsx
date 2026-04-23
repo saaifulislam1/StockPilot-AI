@@ -6,6 +6,7 @@ import { Icon } from "@/components/app-icons";
 export type ProductTextKey = "productName" | "supplier";
 export type ProductNumberKey =
   | "buyingCostPerUnit"
+  | "transportationCostToHome"
   | "unitsBought"
   | "deliveryCostPerOrder"
   | "packagingCostPerOrder"
@@ -48,6 +49,11 @@ const numberFields: Array<{
     key: "buyingCostPerUnit",
     placeholder: "1100",
     required: true,
+  },
+  {
+    label: "Transport Cost To Home (BDT)",
+    key: "transportationCostToHome",
+    placeholder: "200",
   },
   { label: "Units Bought", key: "unitsBought", placeholder: "20", required: true },
   {

@@ -7,6 +7,7 @@ import {
   type SalesEntry,
   computeResearchModel,
   fallbackDataset,
+  normalizeProductInputs,
 } from "@/lib/product-research";
 
 type WorkspaceRow = {
@@ -95,7 +96,7 @@ export async function loadResearchDataset(): Promise<ResearchDataset> {
 function mapRowToDataset(row: WorkspaceRow): ResearchDataset {
   return withStorage(
     {
-      product: row.product,
+      product: normalizeProductInputs(row.product),
       competitors: row.competitors ?? [],
       salesLog: row.sales_log ?? [],
       scenarioUnitsSold: row.scenario_units_sold,
