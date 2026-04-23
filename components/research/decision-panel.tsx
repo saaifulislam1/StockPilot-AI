@@ -11,7 +11,6 @@ import { type CompetitorEntry, getAdjustedPrice } from "@/lib/product-research";
 
 type DecisionPanelProps = {
   competitors: CompetitorEntry[];
-  deliveryCostPerOrder: number;
   model: ReturnType<typeof import("@/lib/product-research").computeResearchModel>;
   onSave?: () => void;
   onBack?: () => void;
@@ -51,7 +50,6 @@ function AnalysisList({
 
 export function DecisionPanel({
   competitors,
-  deliveryCostPerOrder,
   model,
   onSave,
   onBack,
@@ -212,7 +210,7 @@ export function DecisionPanel({
                           <p className="text-sm text-[var(--muted)]">Adjusted price</p>
                           <p className="mt-1 font-semibold text-[var(--text)]">
                             {formatCurrency(
-                              getAdjustedPrice(entry, deliveryCostPerOrder),
+                              getAdjustedPrice(entry),
                             )}
                           </p>
                         </div>

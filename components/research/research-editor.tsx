@@ -133,6 +133,33 @@ function hasRequiredProductInputs(validation: ProductValidation) {
   return Object.values(validation).every(Boolean);
 }
 
+function normalizeCompetitorsForSave(entries: CompetitorEntry[]) {
+  return entries
+    .filter((entry) => entry.listedPrice > 0)
+    .map((entry) => ({
+      ...entry,
+      productLinks: normalizeLinks(
+        entry.productLinks ?? (entry.productUrl ? [entry.productUrl] : []),
+      ),
+    }));
+}
+
+function createEditorSnapshot(product: ProductInputs, competitors: CompetitorEntry[]) {
+  return JSON.stringify({
+    product,
+    competitors: normalizeCompetitorsForSave(competitors).map((entry) => ({
+      date: entry.date,
+      competitor: entry.competitor,
+      channel: entry.channel,
+      listedPrice: entry.listedPrice,
+      customDeliveryFee: entry.customDeliveryFee ?? 0,
+      notes: entry.notes ?? "",
+      productLinks: entry.productLinks ?? [],
+    })),
+    scenarioUnitsSold: product.unitsBought,
+  });
+}
+
 export function ResearchEditor({
   initialDataset,
   mode,
@@ -150,6 +177,14 @@ export function ResearchEditor({
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>(
     ensureCompetitorIds(initialDataset.competitors),
   );
+  const [savedProduct, setSavedProduct] = useState<ProductInputs>(initialDataset.product);
+  const [savedProductDrafts, setSavedProductDrafts] = useState<ProductFieldDrafts>(
+    createProductFieldDrafts(initialDataset.product),
+  );
+  const [savedCompetitors, setSavedCompetitors] = useState<CompetitorEntry[]>(
+    ensureCompetitorIds(initialDataset.competitors),
+  );
+  const [showStopEditModal, setShowStopEditModal] = useState(false);
   const [saveState, setSaveState] = useState(
     initialDataset.storage.provider === "neon"
       ? "Ready"
@@ -174,6 +209,15 @@ export function ResearchEditor({
     [product, productDrafts],
   );
   const canContinue = hasRequiredProductInputs(productValidation);
+  const savedSnapshot = useMemo(
+    () => createEditorSnapshot(savedProduct, savedCompetitors),
+    [savedCompetitors, savedProduct],
+  );
+  const currentSnapshot = useMemo(
+    () => createEditorSnapshot(product, competitors),
+    [competitors, product],
+  );
+  const hasUnsavedChanges = currentSnapshot !== savedSnapshot;
 
   function updateProductText(key: ProductTextKey, value: string) {
     setProduct((current) => ({
@@ -235,14 +279,10 @@ export function ResearchEditor({
 
     startTransition(async () => {
       try {
+        const normalizedCompetitors = normalizeCompetitorsForSave(competitors);
         const payload = {
           product,
-          competitors: competitors.filter((entry) => entry.listedPrice > 0).map((entry) => ({
-            ...entry,
-            productLinks: normalizeLinks(
-              entry.productLinks ?? (entry.productUrl ? [entry.productUrl] : []),
-            ),
-          })),
+          competitors: normalizedCompetitors,
           scenarioUnitsSold: product.unitsBought,
         };
 
@@ -260,6 +300,11 @@ export function ResearchEditor({
 
         await updateResearchAction(researchId, payload);
         setSaveState("Updated");
+        setSavedProduct(product);
+        setSavedProductDrafts(createProductFieldDrafts(product));
+        setSavedCompetitors(ensureCompetitorIds(normalizedCompetitors));
+        setCompetitors(ensureCompetitorIds(normalizedCompetitors));
+        setShowStopEditModal(false);
         setIsEditing(false);
         setStep("analysis");
         router.refresh();
@@ -292,11 +337,28 @@ export function ResearchEditor({
   }
 
   function toggleEditing() {
-    setIsEditing((current) => {
-      const next = !current;
-      setStep(next ? "inputs" : "analysis");
-      return next;
-    });
+    if (!isEditing) {
+      setIsEditing(true);
+      setStep("inputs");
+      return;
+    }
+
+    if (hasUnsavedChanges) {
+      setShowStopEditModal(true);
+      return;
+    }
+
+    setIsEditing(false);
+    setStep("analysis");
+  }
+
+  function discardEditingChanges() {
+    setProduct(savedProduct);
+    setProductDrafts(savedProductDrafts);
+    setCompetitors(savedCompetitors);
+    setShowStopEditModal(false);
+    setIsEditing(false);
+    setStep("analysis");
   }
 
   return (
@@ -395,7 +457,6 @@ export function ResearchEditor({
             <CompetitorSection
               competitors={competitors}
               editable={true}
-              deliveryCostPerOrder={product.deliveryCostPerOrder}
               onAddCompetitor={addCompetitor}
               onRemoveCompetitor={removeCompetitor}
               onUpdateCompetitor={updateCompetitor}
@@ -418,7 +479,6 @@ export function ResearchEditor({
         {showAnalysis ? (
           <DecisionPanel
             competitors={competitors}
-            deliveryCostPerOrder={product.deliveryCostPerOrder}
             model={model}
             onBack={inputMode ? () => setStep("inputs") : undefined}
             onSave={inputMode ? saveResearch : undefined}
@@ -436,6 +496,49 @@ export function ResearchEditor({
           />
         ) : null}
       </div>
+
+      {showStopEditModal ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-4">
+          <div className="w-full max-w-md rounded-[1.75rem] border border-[var(--border)] bg-[var(--surface-strong)] p-6 shadow-[0_20px_60px_rgba(15,23,42,0.18)]">
+            <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
+              Unsaved changes
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--text)]">
+              Update this research before leaving edit mode?
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
+              You changed the saved research. Update now to keep the edits, or
+              discard them and return to read mode.
+            </p>
+
+            <div className="mt-6 flex flex-wrap justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowStopEditModal(false)}
+                className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
+              >
+                Keep Editing
+              </button>
+              <button
+                type="button"
+                onClick={discardEditingChanges}
+                className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted)] transition hover:border-rose-400 hover:text-rose-600"
+              >
+                Discard Changes
+              </button>
+              <button
+                type="button"
+                onClick={saveResearch}
+                disabled={isPending}
+                className="inline-flex items-center gap-2 rounded-full bg-[var(--text)] px-4 py-2 text-sm font-medium text-[var(--bg)] transition hover:opacity-92 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Icon name="save" className="h-4 w-4" />
+                {isPending ? "Updating..." : "Update Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

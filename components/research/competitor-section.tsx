@@ -1,4 +1,5 @@
 import {
+  DEFAULT_COMPETITOR_DELIVERY_FEE,
   type Channel,
   type CompetitorEntry,
   getAdjustedPrice,
@@ -14,7 +15,6 @@ import { Icon } from "@/components/app-icons";
 type CompetitorSectionProps = {
   competitors: CompetitorEntry[];
   editable: boolean;
-  deliveryCostPerOrder: number;
   onAddCompetitor: () => void;
   onRemoveCompetitor: (index: number) => void;
   onUpdateCompetitor: (
@@ -29,7 +29,6 @@ const channels: Channel[] = ["Website", "Facebook", "Marketplace", "Retail"];
 export function CompetitorSection({
   competitors,
   editable,
-  deliveryCostPerOrder,
   onAddCompetitor,
   onRemoveCompetitor,
   onUpdateCompetitor,
@@ -133,7 +132,7 @@ export function CompetitorSection({
                     type="number"
                     className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
                     value={entry.customDeliveryFee === 0 ? "" : entry.customDeliveryFee}
-                    placeholder={`Fee ${deliveryCostPerOrder || 0}`}
+                    placeholder={`Fee ${DEFAULT_COMPETITOR_DELIVERY_FEE}`}
                     onChange={(event) =>
                       onUpdateCompetitor(
                         index,
@@ -176,7 +175,7 @@ export function CompetitorSection({
                 </div>
                 <div className="mt-3 rounded-lg bg-[var(--accent-soft)] px-3 py-2 text-sm text-[var(--accent-strong)]">
                   Adjusted market price:{" "}
-                  {formatCurrency(getAdjustedPrice(entry, deliveryCostPerOrder))}
+                  {formatCurrency(getAdjustedPrice(entry))}
                 </div>
               </div>
             ))}
@@ -199,7 +198,7 @@ export function CompetitorSection({
                   </p>
                 </div>
                 <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-sm font-medium text-[var(--accent-strong)]">
-                  {formatCurrency(getAdjustedPrice(entry, deliveryCostPerOrder))}
+                  {formatCurrency(getAdjustedPrice(entry))}
                 </span>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -236,14 +235,14 @@ export function CompetitorSection({
                     {formatCurrency(
                       entry.customDeliveryFee && entry.customDeliveryFee > 0
                         ? entry.customDeliveryFee
-                        : deliveryCostPerOrder,
+                        : DEFAULT_COMPETITOR_DELIVERY_FEE,
                     )}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[var(--muted)]">Adjusted market price</p>
                   <p className="mt-1 font-semibold text-[var(--text)]">
-                    {formatCurrency(getAdjustedPrice(entry, deliveryCostPerOrder))}
+                    {formatCurrency(getAdjustedPrice(entry))}
                   </p>
                 </div>
                 <div>

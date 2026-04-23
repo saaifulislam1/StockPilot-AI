@@ -90,6 +90,8 @@ export function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+export const DEFAULT_COMPETITOR_DELIVERY_FEE = 70;
+
 function average(values: number[]) {
   if (values.length === 0) {
     return 0;
@@ -102,15 +104,12 @@ function countWhere<T>(values: T[], predicate: (value: T) => boolean) {
   return values.reduce((count, value) => count + (predicate(value) ? 1 : 0), 0);
 }
 
-export function getAdjustedPrice(
-  competitor: CompetitorEntry,
-  deliveryCostPerOrder: number,
-) {
+export function getAdjustedPrice(competitor: CompetitorEntry) {
   return (
     competitor.listedPrice +
     (competitor.customDeliveryFee && competitor.customDeliveryFee > 0
       ? competitor.customDeliveryFee
-      : deliveryCostPerOrder)
+      : DEFAULT_COMPETITOR_DELIVERY_FEE)
   );
 }
 
@@ -123,9 +122,7 @@ export function computeResearchModel(
   const salesLog = dataset.salesLog;
 
   const listedPrices = competitors.map((entry) => entry.listedPrice);
-  const adjustedPrices = competitors.map((entry) =>
-    getAdjustedPrice(entry, product.deliveryCostPerOrder),
-  );
+  const adjustedPrices = competitors.map((entry) => getAdjustedPrice(entry));
   const averageCompetitorPrice = roundCurrency(average(listedPrices));
   const averageAdjustedCompetitorPrice = roundCurrency(average(adjustedPrices));
   const hasMarketAverage = listedPrices.length > 0 && averageCompetitorPrice > 0;
