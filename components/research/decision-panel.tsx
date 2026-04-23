@@ -360,31 +360,100 @@ export function DecisionPanel({
 
             <ShellCard className="p-6">
               <h3 className="text-xl font-semibold text-[var(--text)]">Price ladder</h3>
-              <div className="mt-5 space-y-4">
+              <div className="mt-5 space-y-3">
                 {[
-                  ["Lowest Competitor", model.competitorSummary.lowestCompetitorPrice, "var(--muted-soft)"],
-                  ["Market Average", model.competitorSummary.averageCompetitorPrice, "var(--accent)"],
-                  ["Recommended Sell", model.pricing.recommendedSellPrice, "#34d399"],
-                  ["Highest Competitor", model.competitorSummary.highestCompetitorPrice, "#f59e0b"],
-                ].map(([label, value, color]) => (
-                  <div key={String(label)}>
-                    <div className="mb-2 flex items-center justify-between text-sm">
-                      <span className="text-[var(--muted)]">{label}</span>
-                      <span className="font-medium text-[var(--text)]">
-                        {ready(Number(value), hasData)}
-                      </span>
+                  {
+                    label: "Lowest Competitor",
+                    value: model.competitorSummary.lowestCompetitorPrice,
+                    color: "var(--muted-soft)",
+                    glow: "rgba(148, 163, 184, 0.35)",
+                    tag: "Floor",
+                  },
+                  {
+                    label: "Market Average",
+                    value: model.competitorSummary.averageCompetitorPrice,
+                    color: "var(--accent)",
+                    glow: "rgba(15, 118, 110, 0.28)",
+                    tag: "Benchmark",
+                  },
+                  {
+                    label: "Recommended Sell",
+                    value: model.pricing.recommendedSellPrice,
+                    color: "#34d399",
+                    glow: "rgba(52, 211, 153, 0.28)",
+                    tag: "Target",
+                  },
+                  {
+                    label: "Highest Competitor",
+                    value: model.competitorSummary.highestCompetitorPrice,
+                    color: "#f59e0b",
+                    glow: "rgba(245, 158, 11, 0.28)",
+                    tag: "Ceiling",
+                  },
+                ].map((item) => {
+                  const width = Math.max((item.value / topPrice) * 100, 8);
+
+                  return (
+                    <div
+                      key={item.label}
+                      className="rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="h-3 w-3 shrink-0 rounded-full"
+                          style={{
+                            backgroundColor: item.color,
+                            boxShadow: `0 0 16px ${item.glow}`,
+                          }}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="truncate text-sm font-semibold text-[var(--text)]">
+                                  {item.label}
+                                </span>
+                                <span className="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface-strong)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
+                                  {item.tag}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="shrink-0 text-right">
+                              <p className="text-base font-semibold text-[var(--text)]">
+                                {ready(item.value, hasData)}
+                              </p>
+                              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--muted)]">
+                                {width.toFixed(0)}%
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="mt-2">
+                            <div className="relative h-3 rounded-full bg-[var(--surface-strong)]">
+                              <div
+                                className="h-3 rounded-full"
+                                style={{
+                                  width: `${width}%`,
+                                  background: `linear-gradient(90deg, ${item.color}, ${item.color})`,
+                                  boxShadow: `0 0 18px ${item.glow}`,
+                                }}
+                              />
+                              <div
+                                className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-2 border-[var(--surface)]"
+                                style={{
+                                  left: `calc(${width}% - 0.45rem)`,
+                                  backgroundColor: item.color,
+                                  boxShadow: `0 0 14px ${item.glow}`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="h-3 rounded-full bg-[var(--surface)]">
-                      <div
-                        className="h-3 rounded-full"
-                        style={{
-                          width: `${Math.max((Number(value) / topPrice) * 100, 8)}%`,
-                          backgroundColor: String(color),
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </ShellCard>
 
