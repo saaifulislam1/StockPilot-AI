@@ -140,16 +140,23 @@ export function MetricTile({
   label,
   value,
   hint,
+  icon,
 }: {
   label: string;
   value: string;
   hint: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <article className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5">
-      <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
-        {label}
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
+          {label}
+        </p>
+        {icon ? (
+          <span className="text-[var(--accent-strong)]">{icon}</span>
+        ) : null}
+      </div>
       <p className="mt-3 text-3xl font-semibold tracking-tight text-[var(--text)]">
         {value}
       </p>

@@ -96,7 +96,7 @@ export function DecisionPanel({
           ) : null
         }
       >
-        <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
           <MetricTile
             label="Buying Cost Per Unit"
             value={buyingCostRange}
@@ -112,6 +112,25 @@ export function DecisionPanel({
             hint="Suggested sell price from true cost plus target profit."
           />
           <MetricTile
+            label="Facebook Avg Sell Price"
+            value={
+              model.competitorSummary.facebookCompetitors > 0
+                ? ready(model.competitorSummary.facebookAveragePrice, hasData)
+                : "—"
+            }
+            hint="Average listed competitor sell price found on Facebook."
+            icon={<Icon name="facebook" className="h-4 w-4" />}
+          />
+          <MetricTile
+            label="Website Avg Sell Price"
+            value={
+              model.competitorSummary.websiteCompetitors > 0
+                ? ready(model.competitorSummary.websiteAveragePrice, hasData)
+                : "—"
+            }
+            hint="Average listed competitor sell price found on websites."
+          />
+          <MetricTile
             label="Net Profit @ Market Avg"
             value={
               hasMarketAverage
@@ -123,6 +142,16 @@ export function DecisionPanel({
                 ? `Margin: ${formatPercent(model.pricing.marginAtMarketAveragePrice)}.`
                 : "Add competitor prices to calculate market-average profit."
             }
+          />
+          <MetricTile
+            label="Profit You Will Make"
+            value={ready(model.pricing.projectedProfitPerOrder, hasData)}
+            hint={`Projected profit per order at the recommended sell price. Margin: ${formatPercent(
+              model.pricing.recommendedSellPrice > 0
+                ? model.pricing.projectedProfitPerOrder /
+                    model.pricing.recommendedSellPrice
+                : 0,
+            )}. ROI: ${formatPercent(model.cashflow.roiThisBatch)}.`}
           />
           <MetricTile
             label="Total Profit (All Units)"
@@ -272,6 +301,7 @@ export function DecisionPanel({
 
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   {[
+                    ["Buying Price Input", ready(model.product.buyingCostPerUnit, hasData)],
                     ["Projected Profit Per Order", ready(model.pricing.projectedProfitPerOrder, hasData)],
                     ["Projected Total Profit", ready(model.pricing.projectedTotalProfit, hasData)],
                     ["ROI This Batch", `${formatPercent(model.cashflow.roiThisBatch)}`],

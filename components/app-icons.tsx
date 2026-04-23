@@ -18,7 +18,8 @@ export function Icon({
     | "store"
     | "link"
     | "chevron-down"
-    | "trash";
+    | "trash"
+    | "facebook";
   className?: string;
 }) {
   const props = {
@@ -154,6 +155,12 @@ export function Icon({
           <path d="M6.5 7 7 19a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l.5-12" />
           <path d="M10 11v6" />
           <path d="M14 11v6" />
+        </svg>
+      );
+    case "facebook":
+      return (
+        <svg {...props}>
+          <path d="M14.5 8H17V4.5h-2.5C11.9 4.5 10 6.4 10 9v2H7v3.5h3V20h3.5v-5.5H16L16.5 11H13.5V9c0-.6.4-1 1-1Z" />
         </svg>
       );
     default:
