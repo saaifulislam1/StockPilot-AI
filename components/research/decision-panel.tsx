@@ -174,6 +174,55 @@ export function DecisionPanel({
             hint="Quick read on margin strength at the current assumptions."
           />
         </div>
+
+        <div className="mt-6 max-w-3xl rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-4">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--border)] pb-3">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
+                Venture Cost Sheet
+              </p>
+              <h4 className="mt-1.5 text-lg font-semibold text-[var(--text)] sm:text-xl">
+                Total Money Needed for this product venture
+              </h4>
+              <p className="mt-1.5 text-sm leading-5 text-[var(--muted)]">
+                Upfront cash needed to launch this batch.
+              </p>
+            </div>
+            <div className="min-w-[170px] rounded-[1rem] border border-[var(--border)] bg-[var(--surface-strong)] px-4 py-2.5 text-right">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--muted)]">
+                Total Due
+              </p>
+              <p className="mt-1 text-xl font-semibold text-[var(--text)] sm:text-2xl">
+                {ready(model.cashflow.totalCashNeeded, hasData)}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3 overflow-hidden rounded-[1rem] border border-[var(--border)]">
+            {[
+              ["Total capital invested", ready(model.cashflow.totalCapitalInvested, hasData)],
+              ["Total ad budget needed", ready(model.cashflow.totalAdBudgetNeeded, hasData)],
+              ["Total packaging cost", ready(model.cashflow.totalPackagingCostNeeded, hasData)],
+            ].map(([label, value], index) => (
+              <div
+                key={label}
+                className={`grid grid-cols-[1fr_auto] items-center gap-3 bg-[var(--surface)] px-4 py-2.5 ${
+                  index === 0 ? "" : "border-t border-[var(--border)]"
+                }`}
+              >
+                <div>
+                  <p className="text-sm font-medium leading-5 text-[var(--text)]">{label}</p>
+                  <p className="mt-0.5 text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">
+                    Line item
+                  </p>
+                </div>
+                <p className="text-right text-base font-semibold text-[var(--text)] sm:text-lg">
+                  {value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </SectionCard>
 
       <div className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">

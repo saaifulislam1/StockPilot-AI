@@ -184,7 +184,10 @@ export function computeResearchModel(
   const totalCapitalInvested = product.buyingCostPerUnit * product.unitsBought;
   const totalAdBudgetNeeded =
     product.averageAdCostPerOrder * product.unitsBought;
-  const totalCashNeeded = totalCapitalInvested + totalAdBudgetNeeded;
+  const totalPackagingCostNeeded =
+    product.packagingCostPerOrder * product.unitsBought;
+  const totalCashNeeded =
+    totalCapitalInvested + totalAdBudgetNeeded + totalPackagingCostNeeded;
   const expectedFailedOrders = Math.round(product.unitsBought * product.failedOrderRate);
   const expectedReturnLossReserve =
     expectedFailedOrders *
@@ -374,6 +377,7 @@ export function computeResearchModel(
     cashflow: {
       totalCapitalInvested,
       totalAdBudgetNeeded,
+      totalPackagingCostNeeded,
       totalCashNeeded,
       expectedFailedOrders,
       expectedReturnLossReserve,

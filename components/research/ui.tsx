@@ -60,7 +60,7 @@ export function getToneTextStyle(status: string): React.CSSProperties {
     return { color: "#111111" };
   }
 
-  return { color: "#ffffff" };
+  return { color: "#111111" };
 }
 
 export function ShellCard({
