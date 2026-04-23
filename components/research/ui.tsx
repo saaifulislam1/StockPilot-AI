@@ -38,6 +38,10 @@ export function getTone(status: string) {
     return "border-amber-500/15 bg-amber-500/10 text-amber-700 dark:text-amber-300";
   }
 
+  if (lower.includes("need")) {
+    return "border-amber-500/15 bg-amber-500/10 text-amber-700 dark:text-amber-300";
+  }
+
   return "border-emerald-500/15 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
 }
 

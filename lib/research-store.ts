@@ -185,7 +185,7 @@ export async function listSavedResearches(): Promise<SavedResearchSummary[]> {
       id: row.id,
       productName: dataset.product.productName,
       supplier: dataset.product.supplier,
-      competitorCount: dataset.competitors.filter((entry) => entry.competitor.trim())
+      competitorCount: dataset.competitors.filter((entry) => entry.listedPrice > 0)
         .length,
       recommendedSellPrice: model.pricing.recommendedSellPrice,
       updatedAt: row.updated_at,

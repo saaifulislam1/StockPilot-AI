@@ -20,7 +20,7 @@ type CompetitorSectionProps = {
   onUpdateCompetitor: (
     index: number,
     key: keyof CompetitorEntry,
-    value: string | number | boolean,
+    value: string | number | boolean | string[],
   ) => void;
 };
 
@@ -34,7 +34,9 @@ export function CompetitorSection({
   onRemoveCompetitor,
   onUpdateCompetitor,
 }: CompetitorSectionProps) {
-  const visibleRows = editable ? competitors : competitors.filter((item) => item.competitor.trim());
+  const visibleRows = editable
+    ? competitors
+    : competitors.filter((item) => item.listedPrice > 0);
 
   return (
     <SectionCard
@@ -62,100 +64,135 @@ export function CompetitorSection({
           body="When the owner starts adding competitor data, this section becomes the live market tracker for pricing decisions."
         />
       ) : editable ? (
-        <div className="space-y-3">
-          <div className="hidden grid-cols-[0.9fr_1.05fr_0.85fr_0.8fr_0.9fr_0.95fr_0.48fr] gap-3 px-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)] lg:grid">
-            <span>Date</span>
-            <span>Competitor</span>
-            <span>Channel</span>
-            <span>Listed Price</span>
-            <span>Delivery Fee</span>
-            <span>Notes</span>
-            <span>Action</span>
-          </div>
-          {competitors.map((entry, index) => (
-            <div
-              key={entry.id ?? index}
-              className="grid gap-3 rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-4 lg:grid-cols-[0.9fr_1.05fr_0.85fr_0.8fr_0.9fr_0.95fr_0.48fr]"
-            >
-              <input
-                type="date"
-                className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
-                value={entry.date}
-                onChange={(event) => onUpdateCompetitor(index, "date", event.target.value)}
-              />
-              <input
-                className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
-                value={entry.competitor}
-                placeholder="Rokomari"
-                onChange={(event) =>
-                  onUpdateCompetitor(index, "competitor", event.target.value)
-                }
-              />
-              <select
-                className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
-                value={entry.channel}
-                onChange={(event) =>
-                  onUpdateCompetitor(index, "channel", event.target.value as Channel)
-                }
-              >
-                {channels.map((channel) => (
-                  <option key={channel} value={channel}>
-                    {channel}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
-                value={entry.listedPrice === 0 ? "" : entry.listedPrice}
-                placeholder="1760"
-                onChange={(event) =>
-                  onUpdateCompetitor(index, "listedPrice", Number(event.target.value))
-                }
-              />
-              <input
-                type="number"
-                className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
-                value={entry.customDeliveryFee === 0 ? "" : entry.customDeliveryFee}
-                placeholder={`Fee ${deliveryCostPerOrder || 0}`}
-                onChange={(event) =>
-                  onUpdateCompetitor(
-                    index,
-                    "customDeliveryFee",
-                    Number(event.target.value),
-                  )
-                }
-              />
-              <input
-                className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
-                value={entry.notes ?? ""}
-                placeholder="Observed market price"
-                onChange={(event) => onUpdateCompetitor(index, "notes", event.target.value)}
-              />
-              <button
-                type="button"
-                onClick={() => onRemoveCompetitor(index)}
-                className="rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--muted)] transition hover:border-rose-400 hover:text-rose-600"
-              >
-                Remove
-              </button>
-              <div className="lg:col-span-7 rounded-lg bg-[var(--accent-soft)] px-3 py-2 text-sm text-[var(--accent-strong)]">
-                Adjusted market price: {formatCurrency(getAdjustedPrice(entry, deliveryCostPerOrder))}
-              </div>
+        <div className="overflow-x-auto">
+          <div className="min-w-[1300px] space-y-3">
+            <div className="grid grid-cols-[0.85fr_1fr_0.8fr_0.75fr_0.8fr_1fr_1.35fr_0.38fr] gap-3 px-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">
+              <span>Date</span>
+              <span>Competitor</span>
+              <span>Channel</span>
+              <span>Listed Price</span>
+              <span>Delivery Fee</span>
+              <span>Notes</span>
+              <span>Product Page Links</span>
+              <span>Action</span>
             </div>
-          ))}
+            {competitors.map((entry, index) => (
+              <div
+                key={entry.id ?? index}
+                className="rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-4"
+              >
+                <div className="grid grid-cols-[0.85fr_1fr_0.8fr_0.75fr_0.8fr_1fr_1.35fr_0.38fr] gap-3">
+                  <input
+                    type="date"
+                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    value={entry.date}
+                    onChange={(event) =>
+                      onUpdateCompetitor(index, "date", event.target.value)
+                    }
+                  />
+                  <input
+                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    value={entry.competitor}
+                    placeholder="Rokomari"
+                    onChange={(event) =>
+                      onUpdateCompetitor(index, "competitor", event.target.value)
+                    }
+                  />
+                  <select
+                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    value={entry.channel}
+                    onChange={(event) =>
+                      onUpdateCompetitor(index, "channel", event.target.value as Channel)
+                    }
+                  >
+                    {channels.map((channel) => (
+                      <option key={channel} value={channel}>
+                        {channel}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="number"
+                    required
+                    className={`min-w-0 rounded-lg border bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)] ${
+                      entry.listedPrice > 0
+                        ? "border-emerald-500/50 focus:border-emerald-600"
+                        : "border-[var(--border)] focus:border-[var(--accent)]"
+                    }`}
+                    value={entry.listedPrice === 0 ? "" : entry.listedPrice}
+                    placeholder="1760"
+                    onChange={(event) =>
+                      onUpdateCompetitor(
+                        index,
+                        "listedPrice",
+                        event.target.value === "" ? 0 : Number(event.target.value),
+                      )
+                    }
+                  />
+                  <input
+                    type="number"
+                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    value={entry.customDeliveryFee === 0 ? "" : entry.customDeliveryFee}
+                    placeholder={`Fee ${deliveryCostPerOrder || 0}`}
+                    onChange={(event) =>
+                      onUpdateCompetitor(
+                        index,
+                        "customDeliveryFee",
+                        Number(event.target.value),
+                      )
+                    }
+                  />
+                  <input
+                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    value={entry.notes ?? ""}
+                    placeholder="Observed market price"
+                    onChange={(event) =>
+                      onUpdateCompetitor(index, "notes", event.target.value)
+                    }
+                  />
+                  <textarea
+                    className="min-h-[44px] min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    value={(entry.productLinks ?? []).join("\n")}
+                    placeholder={"https://store.com/product-1\nhttps://store.com/product-2"}
+                    onChange={(event) =>
+                      onUpdateCompetitor(
+                        index,
+                        "productLinks",
+                        event.target.value
+                          .split("\n")
+                          .map((link) => link.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onRemoveCompetitor(index)}
+                    aria-label="Remove competitor row"
+                    className="inline-flex h-9 w-9 items-center justify-center self-start rounded-md border border-[var(--border)] bg-[var(--surface-strong)] text-[var(--muted)] transition hover:border-rose-400 hover:text-rose-600"
+                  >
+                    <Icon name="trash" className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <div className="mt-3 rounded-lg bg-[var(--accent-soft)] px-3 py-2 text-sm text-[var(--accent-strong)]">
+                  Adjusted market price:{" "}
+                  {formatCurrency(getAdjustedPrice(entry, deliveryCostPerOrder))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {visibleRows.map((entry) => (
             <article
-              key={`${entry.date}-${entry.competitor}`}
+              key={`${entry.date}-${entry.competitor}-${entry.listedPrice}`}
               className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className="text-lg font-semibold text-[var(--text)]">
-                    {entry.competitor}
+                    {entry.competitor || "Unnamed competitor"}
                   </h3>
                   <p className="mt-1 text-sm text-[var(--muted)]">
                     {entry.channel} • {entry.date}
@@ -171,6 +208,27 @@ export function CompetitorSection({
                   <p className="mt-1 font-semibold text-[var(--text)]">
                     {formatCurrency(entry.listedPrice)}
                   </p>
+                </div>
+                <div>
+                  <p className="text-sm text-[var(--muted)]">Product pages</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {(entry.productLinks ?? []).length > 0 ? (
+                      (entry.productLinks ?? []).map((link) => (
+                        <a
+                          key={link}
+                          href={link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-1.5 text-sm font-medium text-[var(--accent-strong)] transition hover:border-[var(--accent)]"
+                        >
+                          <Icon name="link" className="h-4 w-4" />
+                          Open page
+                        </a>
+                      ))
+                    ) : (
+                      <p className="font-semibold text-[var(--text)]">—</p>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm text-[var(--muted)]">Delivery fee used</p>

@@ -15,7 +15,10 @@ export function Icon({
     | "edit"
     | "arrow-right"
     | "clock"
-    | "store";
+    | "store"
+    | "link"
+    | "chevron-down"
+    | "trash";
   className?: string;
 }) {
   const props = {
@@ -127,6 +130,30 @@ export function Icon({
           <path d="M6 10V7.5A2.5 2.5 0 0 1 8.5 5h7A2.5 2.5 0 0 1 18 7.5V10" />
           <path d="M5 10v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
           <path d="M10 14h4" />
+        </svg>
+      );
+    case "link":
+      return (
+        <svg {...props}>
+          <path d="M10 14 7.5 16.5a3 3 0 1 1-4.2-4.2L5.8 9.8" />
+          <path d="m14 10 2.5-2.5a3 3 0 0 1 4.2 4.2l-2.5 2.5" />
+          <path d="m8.5 15.5 7-7" />
+        </svg>
+      );
+    case "chevron-down":
+      return (
+        <svg {...props}>
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      );
+    case "trash":
+      return (
+        <svg {...props}>
+          <path d="M4 7h16" />
+          <path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7" />
+          <path d="M6.5 7 7 19a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l.5-12" />
+          <path d="M10 11v6" />
+          <path d="M14 11v6" />
         </svg>
       );
     default:

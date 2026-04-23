@@ -18,6 +18,8 @@ export type CompetitorEntry = {
   id?: string;
   date: string;
   competitor: string;
+  productLinks?: string[];
+  productUrl?: string;
   channel: Channel;
   listedPrice: number;
   customDeliveryFee?: number;
@@ -54,17 +56,17 @@ export type StrategyScenario = {
 
 export const fallbackDataset: ResearchDataset = {
   product: {
-    productName: "",
-    supplier: "",
-    buyingCostPerUnit: 0,
-    unitsBought: 0,
-    deliveryCostPerOrder: 0,
-    packagingCostPerOrder: 0,
-    averageAdCostPerOrder: 0,
-    failedOrderRate: 0,
-    returnLossPerFailedOrder: 0,
-    targetNetProfitPerOrder: 0,
-    manualTargetSellPrice: 0,
+    productName: "Mini Multi Cooker",
+    supplier: "Example supplier",
+    buyingCostPerUnit: 1100,
+    unitsBought: 20,
+    deliveryCostPerOrder: 120,
+    packagingCostPerOrder: 30,
+    averageAdCostPerOrder: 200,
+    failedOrderRate: 0.16,
+    returnLossPerFailedOrder: 80,
+    targetNetProfitPerOrder: 350,
+    manualTargetSellPrice: 1990,
   },
   competitors: [],
   salesLog: [],
@@ -76,6 +78,12 @@ export const fallbackDataset: ResearchDataset = {
 
 export function roundCurrency(value: number) {
   return Math.round(Number.isFinite(value) ? value : 0);
+}
+
+export function normalizeLinks(links: string[]) {
+  return links
+    .map((link) => link.trim())
+    .filter(Boolean);
 }
 
 export function clamp(value: number, min: number, max: number) {
@@ -111,9 +119,7 @@ export function computeResearchModel(
   scenarioUnitsSold?: number,
 ) {
   const product = dataset.product;
-  const competitors = dataset.competitors.filter(
-    (entry) => entry.competitor && entry.listedPrice > 0,
-  );
+  const competitors = dataset.competitors.filter((entry) => entry.listedPrice > 0);
   const salesLog = dataset.salesLog;
 
   const listedPrices = competitors.map((entry) => entry.listedPrice);
@@ -122,6 +128,7 @@ export function computeResearchModel(
   );
   const averageCompetitorPrice = roundCurrency(average(listedPrices));
   const averageAdjustedCompetitorPrice = roundCurrency(average(adjustedPrices));
+  const hasMarketAverage = listedPrices.length > 0 && averageCompetitorPrice > 0;
   const lowestCompetitorPrice =
     listedPrices.length > 0 ? Math.min(...listedPrices) : 0;
   const highestCompetitorPrice =
@@ -152,22 +159,26 @@ export function computeResearchModel(
   const recommendedSellPrice =
     trueCostPerSuccessfulOrder + product.targetNetProfitPerOrder;
   const idealBuyingCostAtMarketAverage =
-    averageCompetitorPrice -
-    product.deliveryCostPerOrder -
-    product.packagingCostPerOrder -
-    product.averageAdCostPerOrder -
-    failedOrderCostSpread -
-    product.targetNetProfitPerOrder;
+    hasMarketAverage
+      ? averageCompetitorPrice -
+        product.deliveryCostPerOrder -
+        product.packagingCostPerOrder -
+        product.averageAdCostPerOrder -
+        failedOrderCostSpread -
+        product.targetNetProfitPerOrder
+      : 0;
   const maxSafeBuyingCost =
-    averageCompetitorPrice -
-    product.deliveryCostPerOrder -
-    product.packagingCostPerOrder -
-    product.averageAdCostPerOrder -
-    failedOrderCostSpread;
+    hasMarketAverage
+      ? averageCompetitorPrice -
+        product.deliveryCostPerOrder -
+        product.packagingCostPerOrder -
+        product.averageAdCostPerOrder -
+        failedOrderCostSpread
+      : 0;
   const netProfitAtMarketAveragePrice =
-    averageCompetitorPrice - trueCostPerSuccessfulOrder;
+    hasMarketAverage ? averageCompetitorPrice - trueCostPerSuccessfulOrder : 0;
   const marginAtMarketAveragePrice =
-    averageCompetitorPrice > 0
+    hasMarketAverage
       ? netProfitAtMarketAveragePrice / averageCompetitorPrice
       : 0;
   const headroomToMaxCompetitorPrice = highestCompetitorPrice - recommendedSellPrice;
@@ -254,22 +265,28 @@ export function computeResearchModel(
   );
 
   const profitStatus =
-    netProfitAtMarketAveragePrice <= 0
-      ? "Loss risk"
-      : netProfitAtMarketAveragePrice < 200
-        ? "Thin margin"
-        : netProfitAtMarketAveragePrice < 350
-          ? "Workable margin"
-          : "Strong margin";
+    !hasMarketAverage
+      ? "Need market data"
+      : netProfitAtMarketAveragePrice <= 0
+        ? "Loss risk"
+        : netProfitAtMarketAveragePrice < 200
+          ? "Thin margin"
+          : netProfitAtMarketAveragePrice < 350
+            ? "Workable margin"
+            : "Strong margin";
 
   const breakEvenAlert =
-    lowestCompetitorPrice < breakEvenSellPrice * 1.05
-      ? "Danger: market below safety threshold"
-      : "Safe margin";
+    !hasMarketAverage
+      ? "Need market data"
+      : lowestCompetitorPrice < breakEvenSellPrice * 1.05
+        ? "Danger: market below safety threshold"
+        : "Safe margin";
   const restockDecision =
-    averageCompetitorPrice > breakEvenSellPrice + 200
-      ? "Yes, restock"
-      : "Wait for a better sourcing or pricing setup";
+    !hasMarketAverage
+      ? "Need market data"
+      : averageCompetitorPrice > breakEvenSellPrice + 200
+        ? "Yes, restock"
+        : "Wait for a better sourcing or pricing setup";
 
   const strategyScenarios: StrategyScenario[] = [
     {

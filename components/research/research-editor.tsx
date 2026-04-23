@@ -10,34 +10,28 @@ import {
 import { Icon } from "@/components/app-icons";
 import { CompetitorSection } from "@/components/research/competitor-section";
 import { DecisionPanel } from "@/components/research/decision-panel";
-import { ProductSection } from "@/components/research/product-section";
 import {
-  ShellCard,
-  getTone,
-} from "@/components/research/ui";
+  ProductSection,
+  type ProductFieldDrafts,
+  type ProductNumberKey,
+  type ProductTextKey,
+  type ProductValidation,
+} from "@/components/research/product-section";
 import {
   type CompetitorEntry,
   type ProductInputs,
   type ResearchDataset,
   computeResearchModel,
+  normalizeLinks,
 } from "@/lib/product-research";
-
-type ProductTextKey = "productName" | "supplier";
-type ProductNumberKey =
-  | "buyingCostPerUnit"
-  | "unitsBought"
-  | "deliveryCostPerOrder"
-  | "packagingCostPerOrder"
-  | "averageAdCostPerOrder"
-  | "returnLossPerFailedOrder"
-  | "targetNetProfitPerOrder"
-  | "manualTargetSellPrice";
 
 type ResearchEditorProps = {
   initialDataset: ResearchDataset;
   mode: "create" | "detail";
   researchId?: string;
 };
+
+type ResearchStep = "inputs" | "analysis";
 
 function blankCompetitor(): CompetitorEntry {
   return {
@@ -48,6 +42,7 @@ function blankCompetitor(): CompetitorEntry {
     listedPrice: 0,
     customDeliveryFee: 0,
     notes: "",
+    productLinks: [],
   };
 }
 
@@ -59,8 +54,83 @@ function ensureCompetitorIds(entries: CompetitorEntry[]) {
   return entries.map((entry) => ({
     ...entry,
     id: entry.id ?? crypto.randomUUID(),
+    productLinks: normalizeLinks(
+      entry.productLinks ?? (entry.productUrl ? [entry.productUrl] : []),
+    ),
     customDeliveryFee: entry.customDeliveryFee ?? 0,
   }));
+}
+
+function createProductFieldDrafts(product: ProductInputs): ProductFieldDrafts {
+  return {
+    buyingCostPerUnit: String(product.buyingCostPerUnit),
+    unitsBought: String(product.unitsBought),
+    deliveryCostPerOrder: String(product.deliveryCostPerOrder),
+    packagingCostPerOrder: String(product.packagingCostPerOrder),
+    averageAdCostPerOrder: String(product.averageAdCostPerOrder),
+    returnLossPerFailedOrder: String(product.returnLossPerFailedOrder),
+    targetNetProfitPerOrder: String(product.targetNetProfitPerOrder),
+    manualTargetSellPrice: String(product.manualTargetSellPrice),
+    failedOrderRate: formatFailedOrderRateDraft(product.failedOrderRate),
+  };
+}
+
+function formatFailedOrderRateDraft(value: number) {
+  return Number((value * 100).toFixed(1)).toString();
+}
+
+function parseNumericInput(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return 0;
+  }
+
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isNonNegativeNumberDraft(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return false;
+  }
+
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) && parsed >= 0;
+}
+
+function isPercentageDraft(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return false;
+  }
+
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100;
+}
+
+function validateProductInputs(
+  product: ProductInputs,
+  drafts: ProductFieldDrafts,
+): ProductValidation {
+  return {
+    productName: Boolean(product.productName.trim()),
+    buyingCostPerUnit: isNonNegativeNumberDraft(drafts.buyingCostPerUnit),
+    unitsBought: isNonNegativeNumberDraft(drafts.unitsBought),
+    deliveryCostPerOrder: isNonNegativeNumberDraft(drafts.deliveryCostPerOrder),
+    packagingCostPerOrder: isNonNegativeNumberDraft(drafts.packagingCostPerOrder),
+    averageAdCostPerOrder: isNonNegativeNumberDraft(drafts.averageAdCostPerOrder),
+    returnLossPerFailedOrder: isNonNegativeNumberDraft(drafts.returnLossPerFailedOrder),
+    targetNetProfitPerOrder: isNonNegativeNumberDraft(drafts.targetNetProfitPerOrder),
+    failedOrderRate: isPercentageDraft(drafts.failedOrderRate),
+  };
+}
+
+function hasRequiredProductInputs(validation: ProductValidation) {
+  return Object.values(validation).every(Boolean);
 }
 
 export function ResearchEditor({
@@ -70,10 +140,13 @@ export function ResearchEditor({
 }: ResearchEditorProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(mode === "create");
-  const [step, setStep] = useState<"inputs" | "analysis">(
+  const [step, setStep] = useState<ResearchStep>(
     mode === "create" ? "inputs" : "analysis",
   );
   const [product, setProduct] = useState<ProductInputs>(initialDataset.product);
+  const [productDrafts, setProductDrafts] = useState<ProductFieldDrafts>(
+    createProductFieldDrafts(initialDataset.product),
+  );
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>(
     ensureCompetitorIds(initialDataset.competitors),
   );
@@ -96,6 +169,11 @@ export function ResearchEditor({
       ),
     [competitors, initialDataset.salesLog, product],
   );
+  const productValidation = useMemo(
+    () => validateProductInputs(product, productDrafts),
+    [product, productDrafts],
+  );
+  const canContinue = hasRequiredProductInputs(productValidation);
 
   function updateProductText(key: ProductTextKey, value: string) {
     setProduct((current) => ({
@@ -104,17 +182,32 @@ export function ResearchEditor({
     }));
   }
 
-  function updateProductNumber(key: ProductNumberKey, value: number) {
+  function updateProductNumber(key: ProductNumberKey, value: string) {
+    setProductDrafts((current) => ({
+      ...current,
+      [key]: value,
+    }));
     setProduct((current) => ({
       ...current,
-      [key]: Number.isFinite(value) ? value : 0,
+      [key]: parseNumericInput(value),
+    }));
+  }
+
+  function updateFailedOrderRate(value: string) {
+    setProductDrafts((current) => ({
+      ...current,
+      failedOrderRate: value,
+    }));
+    setProduct((current) => ({
+      ...current,
+      failedOrderRate: parseNumericInput(value) / 100,
     }));
   }
 
   function updateCompetitor(
     index: number,
     key: keyof CompetitorEntry,
-    value: string | number | boolean,
+    value: string | number | boolean | string[],
   ) {
     setCompetitors((current) =>
       current.map((entry, currentIndex) =>
@@ -135,8 +228,8 @@ export function ResearchEditor({
   }
 
   function saveResearch() {
-    if (!product.productName.trim()) {
-      setSaveState("Product name required");
+    if (!canContinue) {
+      setSaveState("Error: complete required fields marked *");
       return;
     }
 
@@ -144,9 +237,12 @@ export function ResearchEditor({
       try {
         const payload = {
           product,
-          competitors: competitors.filter(
-            (entry) => entry.competitor.trim() || entry.listedPrice > 0,
-          ),
+          competitors: competitors.filter((entry) => entry.listedPrice > 0).map((entry) => ({
+            ...entry,
+            productLinks: normalizeLinks(
+              entry.productLinks ?? (entry.productUrl ? [entry.productUrl] : []),
+            ),
+          })),
           scenarioUnitsSold: product.unitsBought,
         };
 
@@ -178,73 +274,122 @@ export function ResearchEditor({
   const showAnalysis = !inputMode || step === "analysis";
 
   function reviewAnalysis() {
-    if (!product.productName.trim()) {
-      setSaveState("Product name required");
+    if (!canContinue) {
+      setSaveState("Error: complete required fields marked *");
       return;
     }
 
     setStep("analysis");
   }
 
+  function goToStep(nextStep: ResearchStep) {
+    if (nextStep === "analysis") {
+      reviewAnalysis();
+      return;
+    }
+
+    setStep("inputs");
+  }
+
+  function toggleEditing() {
+    setIsEditing((current) => {
+      const next = !current;
+      setStep(next ? "inputs" : "analysis");
+      return next;
+    });
+  }
+
   return (
     <div className="space-y-6">
-      <ShellCard className="px-6 py-8 sm:px-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-3xl">
-            <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
-              {mode === "create" ? "New Research" : "Saved Product"}
-            </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[var(--text)] sm:text-4xl">
-              {mode === "create"
-                ? "Create product research"
-                : product.productName || "Saved product research"}
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-              {inputMode
-                ? showInputs
-                  ? "Enter only the manual product and market inputs. Then move to analysis to review the automated output."
-                  : "Review the automated analysis, then decide whether to save this research."
-                : "This is the saved research in read mode. Switch to edit mode if the supplier, competitor prices, or assumptions change."}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className={`rounded-full border px-3 py-1.5 text-sm font-medium ${getTone(saveState)}`}>
-              {saveState}
-            </span>
-            {mode === "detail" ? (
-              <button
-                type="button"
-                onClick={() =>
-                  setIsEditing((current) => {
-                    const next = !current;
-                    setStep(next ? "inputs" : "analysis");
-                    return next;
-                  })
-                }
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
-              >
-                <Icon name="edit" className="h-4 w-4" />
-                {isEditing ? "Stop Editing" : "Edit Research"}
-              </button>
-            ) : null}
-          </div>
-        </div>
-      </ShellCard>
-
       <div className="grid gap-6">
+        {inputMode ? (
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4 sm:px-5">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              {[
+                {
+                  stepKey: "inputs" as const,
+                  number: "01",
+                  title: "Inputs",
+                  complete: step === "analysis",
+                  disabled: false,
+                },
+                {
+                  stepKey: "analysis" as const,
+                  number: "02",
+                  title: "Analysis",
+                  complete: false,
+                  disabled: !canContinue,
+                },
+              ].map((stage) => {
+                const active = step === stage.stepKey;
+
+                return (
+                  <div key={stage.stepKey} className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => goToStep(stage.stepKey)}
+                      disabled={stage.disabled}
+                      className="flex items-center gap-3 text-left transition disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <span
+                        className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-semibold ${
+                          active
+                            ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent-strong)]"
+                            : stage.complete
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
+                              : "border-[var(--border)] bg-[var(--surface-strong)] text-[var(--muted)]"
+                        }`}
+                      >
+                        {stage.number}
+                      </span>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
+                          Step {stage.number}
+                        </p>
+                        <p className="mt-1 text-base font-semibold text-[var(--text)]">
+                          {stage.title}
+                        </p>
+                      </div>
+                    </button>
+
+                    {stage.stepKey === "inputs" ? (
+                      <div className="hidden h-px w-10 bg-[var(--border)] sm:block" />
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+            <p className={`text-sm font-medium ${canContinue ? "text-emerald-700" : "text-rose-700"}`}>
+              {canContinue
+                ? "Required fields complete."
+                : "Finish required fields to unlock analysis."}
+            </p>
+          </div>
+        ) : null}
+
+        {mode === "detail" ? (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={toggleEditing}
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
+            >
+              <Icon name="edit" className="h-4 w-4" />
+              {isEditing ? "Stop Editing" : "Edit Research"}
+            </button>
+          </div>
+        ) : null}
+
         {showInputs ? (
           <>
             <ProductSection
               product={product}
+              fieldValues={productDrafts}
+              validation={productValidation}
               editable={true}
               onTextChange={updateProductText}
               onNumberChange={updateProductNumber}
-              onFailedOrderRateChange={(value) =>
-                setProduct((current) => ({
-                  ...current,
-                  failedOrderRate: value,
-                }))
-              }
+              onFailedOrderRateChange={updateFailedOrderRate}
             />
 
             <CompetitorSection
@@ -256,30 +401,17 @@ export function ResearchEditor({
               onUpdateCompetitor={updateCompetitor}
             />
 
-            <ShellCard className="p-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
-                    Next step
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-[var(--text)]">
-                    Review the analysis
-                  </h2>
-                  <p className="mt-2 text-sm leading-7 text-[var(--muted)]">
-                    Once inputs are ready, move to the analysis screen to review pricing
-                    and decide whether to save.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={reviewAnalysis}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--text)] px-5 py-3 text-sm font-medium text-[var(--bg)] transition hover:opacity-92"
-                >
-                  <Icon name="arrow-right" className="h-4 w-4" />
-                  Review Analysis
-                </button>
-              </div>
-            </ShellCard>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={reviewAnalysis}
+                disabled={!canContinue}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--text)] px-5 py-3 text-sm font-medium text-[var(--bg)] transition hover:opacity-92 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Icon name="arrow-right" className="h-4 w-4" />
+                Review Analysis
+              </button>
+            </div>
           </>
         ) : null}
 
@@ -299,7 +431,7 @@ export function ResearchEditor({
                   ? "Updating Research..."
                   : "Update Research"
             }
-            saveDisabled={isPending}
+            saveDisabled={isPending || !canContinue}
             saveStatus={saveState}
           />
         ) : null}
