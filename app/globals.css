@@ -1,17 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #fcf7f0;
-  --surface: #fffaf3;
-  --surface-strong: rgba(255, 252, 246, 0.92);
-  --surface-muted: #f7ecdc;
-  --border: #e6d8c5;
-  --text: #142033;
-  --muted: #5e6778;
-  --muted-soft: #9ca5b5;
+  --bg: #f3efe9;
+  --surface: #f8f4ee;
+  --surface-raised: #fdfbf8;
+  --surface-strong: rgba(255, 251, 246, 0.88);
+  --surface-muted: #f0e8dc;
+  --border: #ded5c8;
+  --border-strong: #ccc1b3;
+  --text: #172033;
+  --muted: #626d7e;
+  --muted-soft: #9aa4b3;
   --accent: #0f766e;
   --accent-strong: #115e59;
-  --accent-soft: rgba(15, 118, 110, 0.12);
+  --accent-soft: rgba(15, 118, 110, 0.09);
+  --ring: rgba(15, 118, 110, 0.18);
+  --shadow-soft: 0 6px 18px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.03);
+  --shadow-card: 0 18px 48px rgba(15, 23, 42, 0.07), 0 3px 10px rgba(15, 23, 42, 0.04);
+  --shadow-elevated: 0 28px 70px rgba(15, 23, 42, 0.09), 0 10px 24px rgba(15, 23, 42, 0.05);
   --status-pill-text: #111111;
 }
 
@@ -25,15 +31,21 @@
 [data-theme="dark"] {
   --bg: #101522;
   --surface: #151d2d;
+  --surface-raised: #192235;
   --surface-strong: rgba(17, 24, 39, 0.92);
   --surface-muted: #1d2940;
   --border: #283550;
+  --border-strong: #35425c;
   --text: #f8fbff;
   --muted: #b4c0d3;
   --muted-soft: #5e6d86;
   --accent: #38b2ac;
   --accent-strong: #7dd3ca;
   --accent-soft: rgba(56, 178, 172, 0.18);
+  --ring: rgba(125, 211, 202, 0.24);
+  --shadow-soft: 0 10px 24px rgba(2, 8, 23, 0.22);
+  --shadow-card: 0 26px 70px rgba(2, 8, 23, 0.32);
+  --shadow-elevated: 0 34px 86px rgba(2, 8, 23, 0.4);
   --status-pill-text: #ffffff;
 }
 
@@ -46,15 +58,40 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.75), transparent 26%),
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.42), transparent 22%),
+    linear-gradient(180deg, #f6f2ec 0%, var(--bg) 34%, #efeae3 100%);
   color: var(--text);
   font-family: var(--font-space-grotesk), sans-serif;
   transition: background-color 180ms ease, color 180ms ease;
 }
 
+[data-theme="dark"] body {
+  background: var(--bg);
+}
+
 ::selection {
   background: rgba(15, 118, 110, 0.22);
   color: var(--text);
+}
+
+:where(input, select, textarea, button) {
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+:where(input, select, textarea)::placeholder {
+  color: var(--muted-soft);
+}
+
+:where(input, select, textarea):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring);
 }
 
 input[type="range"]::-webkit-slider-thumb {

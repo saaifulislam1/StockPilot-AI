@@ -85,7 +85,7 @@ const numberFields: Array<{
 
 function DisplayRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-4 shadow-[var(--shadow-soft)]">
       <p className="text-sm text-[var(--muted)]">{label}</p>
       <p className="mt-2 text-base font-semibold text-[var(--text)]">{value || "—"}</p>
     </div>
@@ -94,14 +94,14 @@ function DisplayRow({ label, value }: { label: string; value: string }) {
 
 function getValidationStyles(required: boolean, valid?: boolean) {
   if (!required) {
-    return "border-[var(--border)] bg-[var(--surface-strong)] focus:border-[var(--accent)]";
+    return "border-[var(--border)] bg-[var(--surface-raised)] shadow-[var(--shadow-soft)] focus:border-[var(--border-strong)]";
   }
 
   if (valid) {
-    return "border-emerald-500/50 bg-emerald-500/[0.04] focus:border-emerald-600";
+    return "border-emerald-500/45 bg-[var(--surface-raised)] shadow-[var(--shadow-soft)] focus:border-emerald-600";
   }
 
-  return "border-rose-500/50 bg-rose-500/[0.04] focus:border-rose-600";
+  return "border-rose-500/45 bg-[var(--surface-raised)] shadow-[var(--shadow-soft)] focus:border-rose-600";
 }
 
 function FieldLabel({
@@ -148,7 +148,7 @@ export function ProductSection({
     >
       {editable ? (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 shadow-[var(--shadow-soft)]">
             <p className="text-sm text-[var(--muted)]">
               Fields marked with <span className="font-semibold text-rose-600">*</span>{" "}
               are required. Valid fields turn green.

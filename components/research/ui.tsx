@@ -58,7 +58,7 @@ export function ShellCard({
 }) {
   return (
     <section
-      className={`rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:rounded-[2rem] ${className}`}
+      className={`rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-raised)] shadow-[var(--shadow-card)] sm:rounded-[2rem] ${className}`}
     >
       {children}
     </section>
@@ -88,7 +88,7 @@ export function PageLoadingState({
   return (
     <ShellCard className="p-8 sm:p-10">
       <div className="flex min-h-[280px] flex-col items-center justify-center text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-strong)]">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--accent-strong)] shadow-[var(--shadow-soft)]">
           <LoadingSpinner className="h-6 w-6" />
         </div>
         <h2 className="mt-5 text-2xl font-semibold tracking-tight text-[var(--text)]">
@@ -117,10 +117,10 @@ export function SectionCard({
 }) {
   return (
     <ShellCard className="overflow-hidden">
-      <div className="border-b border-[var(--border)] bg-[var(--surface)] px-4 py-4 sm:px-6 sm:py-5">
+      <div className="border-b border-[var(--border)] bg-[linear-gradient(180deg,var(--surface-raised)_0%,var(--surface)_100%)] px-4 py-5 sm:px-6 sm:py-6">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
           <div className="flex items-start gap-3 sm:gap-4">
-            <div className="rounded-[1.25rem] bg-[var(--accent-soft)] p-3 text-[var(--accent-strong)] sm:rounded-2xl">
+            <div className="rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-3 text-[var(--accent-strong)] shadow-[var(--shadow-soft)] sm:rounded-2xl">
               {icon}
             </div>
             <div>
@@ -154,10 +154,10 @@ export function HeroPanel({
 }) {
   return (
     <ShellCard className="overflow-hidden">
-      <div className="bg-[var(--surface)] px-4 py-6 sm:px-8 sm:py-8">
+      <div className="bg-[linear-gradient(180deg,var(--surface-raised)_0%,var(--surface)_100%)] px-4 py-6 sm:px-8 sm:py-8">
         <div className="flex flex-wrap items-start justify-between gap-8">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-1.5 text-xs font-medium uppercase tracking-[0.24em] text-[var(--accent-strong)]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-medium uppercase tracking-[0.24em] text-[var(--accent-strong)] shadow-[var(--shadow-soft)]">
               <Icon name="spark" className="h-4 w-4" />
               Automated Research
             </div>
@@ -187,7 +187,7 @@ export function MetricTile({
   icon?: React.ReactNode;
 }) {
   return (
-    <article className="rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-4 sm:rounded-[1.5rem] sm:p-5">
+    <article className="rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-soft)] sm:rounded-[1.5rem] sm:p-5">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
           {label}
@@ -214,8 +214,8 @@ export function EmptyState({
   body: string;
 }) {
   return (
-    <div className="rounded-[1.75rem] border border-dashed border-[var(--border)] bg-[var(--surface)] px-6 py-10 text-center">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-strong)]">
+    <div className="rounded-[1.75rem] border border-dashed border-[var(--border)] bg-[var(--surface)] px-6 py-10 text-center shadow-[var(--shadow-soft)]">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] text-[var(--accent-strong)]">
         {icon}
       </div>
       <h3 className="mt-4 text-lg font-semibold text-[var(--text)]">{title}</h3>
