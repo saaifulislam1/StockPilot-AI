@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { SiteNavbar } from "@/components/site-navbar";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 const pageTheme = {
-  colorScheme: "dark",
+  colorScheme: "light",
 };
 
 export const viewport = pageTheme;
@@ -33,9 +34,34 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="light"
+      suppressHydrationWarning
       className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-950">{children}</body>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  var stored = localStorage.getItem('stockpilot-theme');
+                  var theme = stored === 'dark' ? 'dark' : 'light';
+                  document.documentElement.dataset.theme = theme;
+                  document.documentElement.style.colorScheme = theme;
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--text)]">
+        <SiteNavbar />
+        <div className="flex-1">
+          <div className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
+            {children}
+          </div>
+        </div>
+      </body>
     </html>
   );
 }

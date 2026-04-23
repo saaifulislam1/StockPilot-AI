@@ -15,12 +15,12 @@ export type ProductInputs = {
 };
 
 export type CompetitorEntry = {
+  id?: string;
   date: string;
   competitor: string;
   channel: Channel;
   listedPrice: number;
-  deliveryIncluded: boolean;
-  offerBundle?: string;
+  customDeliveryFee?: number;
   notes?: string;
 };
 
@@ -54,56 +54,21 @@ export type StrategyScenario = {
 
 export const fallbackDataset: ResearchDataset = {
   product: {
-    productName: "Mini Multi Cooker",
-    supplier: "Example supplier",
-    buyingCostPerUnit: 1100,
-    unitsBought: 20,
-    deliveryCostPerOrder: 120,
-    packagingCostPerOrder: 30,
-    averageAdCostPerOrder: 200,
-    failedOrderRate: 0.16,
-    returnLossPerFailedOrder: 80,
-    targetNetProfitPerOrder: 350,
-    manualTargetSellPrice: 1990,
+    productName: "",
+    supplier: "",
+    buyingCostPerUnit: 0,
+    unitsBought: 0,
+    deliveryCostPerOrder: 0,
+    packagingCostPerOrder: 0,
+    averageAdCostPerOrder: 0,
+    failedOrderRate: 0,
+    returnLossPerFailedOrder: 0,
+    targetNetProfitPerOrder: 0,
+    manualTargetSellPrice: 0,
   },
-  competitors: [
-    {
-      date: "2026-04-23",
-      competitor: "Rokomari",
-      channel: "Website",
-      listedPrice: 1760,
-      deliveryIncluded: false,
-      notes: "Observed market price",
-    },
-    {
-      date: "2026-04-23",
-      competitor: "Othoba",
-      channel: "Website",
-      listedPrice: 1780,
-      deliveryIncluded: false,
-      notes: "Observed market price",
-    },
-    {
-      date: "2026-04-23",
-      competitor: "Facebook Page A",
-      channel: "Facebook",
-      listedPrice: 1890,
-      deliveryIncluded: true,
-      offerBundle: "Free spoon",
-      notes: "Premium positioning",
-    },
-    {
-      date: "2026-04-23",
-      competitor: "Facebook Page B",
-      channel: "Facebook",
-      listedPrice: 1990,
-      deliveryIncluded: true,
-      offerBundle: "Cash on delivery",
-      notes: "Value-based offer",
-    },
-  ],
+  competitors: [],
   salesLog: [],
-  scenarioUnitsSold: 20,
+  scenarioUnitsSold: 0,
   storage: {
     provider: "local",
   },
@@ -133,9 +98,12 @@ export function getAdjustedPrice(
   competitor: CompetitorEntry,
   deliveryCostPerOrder: number,
 ) {
-  return competitor.deliveryIncluded
-    ? competitor.listedPrice
-    : competitor.listedPrice + deliveryCostPerOrder;
+  return (
+    competitor.listedPrice +
+    (competitor.customDeliveryFee && competitor.customDeliveryFee > 0
+      ? competitor.customDeliveryFee
+      : deliveryCostPerOrder)
+  );
 }
 
 export function computeResearchModel(

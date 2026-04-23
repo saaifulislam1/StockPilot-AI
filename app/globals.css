@@ -1,15 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --background: #08111f;
-  --foreground: #e5eefc;
+  --bg: #f4f7fb;
+  --surface: #f2f6fb;
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --surface-muted: #eaf1fb;
+  --border: #d9e2f0;
+  --text: #0f172a;
+  --muted: #5c6b80;
+  --muted-soft: #94a3b8;
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-soft: rgba(37, 99, 235, 0.1);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
   --font-sans: var(--font-space-grotesk);
   --font-mono: var(--font-ibm-plex-mono);
+}
+
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #111b2d;
+  --surface-strong: rgba(15, 23, 42, 0.9);
+  --surface-muted: #172338;
+  --border: #24334d;
+  --text: #f8fafc;
+  --muted: #a5b2c5;
+  --muted-soft: #475569;
+  --accent: #60a5fa;
+  --accent-strong: #93c5fd;
+  --accent-soft: rgba(96, 165, 250, 0.16);
 }
 
 * {
@@ -21,14 +44,18 @@ html {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 24%),
+    var(--bg);
+  color: var(--text);
   font-family: var(--font-space-grotesk), sans-serif;
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.35);
-  color: white;
+  background: rgba(37, 99, 235, 0.22);
+  color: var(--text);
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -37,14 +64,14 @@ input[type="range"]::-webkit-slider-thumb {
   height: 18px;
   width: 18px;
   border-radius: 9999px;
-  background: #cffafe;
-  border: 2px solid #0f172a;
+  background: var(--accent);
+  border: 2px solid var(--surface-strong);
 }
 
 input[type="range"]::-moz-range-thumb {
   height: 18px;
   width: 18px;
   border-radius: 9999px;
-  background: #cffafe;
-  border: 2px solid #0f172a;
+  background: var(--accent);
+  border: 2px solid var(--surface-strong);
 }

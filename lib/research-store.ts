@@ -4,22 +4,33 @@ import {
   type ProductInputs,
   type ResearchDataset,
   type SalesEntry,
+  computeResearchModel,
   fallbackDataset,
 } from "@/lib/product-research";
 
-const WORKSPACE_ID = "default";
-
 type WorkspaceRow = {
+  id: string;
   product: ProductInputs;
   competitors: CompetitorEntry[];
   sales_log: SalesEntry[];
   scenario_units_sold: number;
+  created_at: string;
+  updated_at: string;
 };
 
 export type SaveWorkspaceInput = {
   product: ProductInputs;
   competitors: CompetitorEntry[];
   scenarioUnitsSold: number;
+};
+
+export type SavedResearchSummary = {
+  id: string;
+  productName: string;
+  supplier: string;
+  competitorCount: number;
+  recommendedSellPrice: number;
+  updatedAt: string;
 };
 
 async function ensureWorkspaceTable() {
@@ -29,7 +40,7 @@ async function ensureWorkspaceTable() {
   }
 
   await sql`
-    create table if not exists product_research_workspaces (
+    create table if not exists product_researches (
       id text primary key,
       product jsonb not null,
       competitors jsonb not null default '[]'::jsonb,
@@ -55,78 +66,39 @@ function withStorage(
   };
 }
 
-async function seedWorkspace(sql: NonNullable<ReturnType<typeof getSql>>) {
-  await sql`
-    insert into product_research_workspaces (
-      id,
-      product,
-      competitors,
-      sales_log,
-      scenario_units_sold
-    )
-    values (
-      ${WORKSPACE_ID},
-      ${JSON.stringify(fallbackDataset.product)}::jsonb,
-      ${JSON.stringify(fallbackDataset.competitors)}::jsonb,
-      ${JSON.stringify(fallbackDataset.salesLog)}::jsonb,
-      ${fallbackDataset.scenarioUnitsSold}
-    )
-    on conflict (id) do nothing
-  `;
-}
-
 export async function loadResearchDataset(): Promise<ResearchDataset> {
   const sql = await ensureWorkspaceTable();
   if (!sql) {
     return fallbackDataset;
   }
 
-  await seedWorkspace(sql);
-  const rows = (await sql`
-    select
-      product,
-      competitors,
-      sales_log,
-      scenario_units_sold
-    from product_research_workspaces
-    where id = ${WORKSPACE_ID}
-    limit 1
-  `) as WorkspaceRow[];
+  return withStorage(fallbackDataset, "neon");
+}
 
-  const row = rows[0];
-  if (!row) {
-    return withStorage(fallbackDataset, "neon");
-  }
-
+function mapRowToDataset(row: WorkspaceRow): ResearchDataset {
   return withStorage(
     {
       product: row.product,
       competitors: row.competitors ?? [],
       salesLog: row.sales_log ?? [],
-      scenarioUnitsSold:
-        row.scenario_units_sold > 0
-          ? row.scenario_units_sold
-          : fallbackDataset.scenarioUnitsSold,
+      scenarioUnitsSold: row.scenario_units_sold,
     },
     "neon",
   );
 }
 
-export async function saveResearchDataset(
+export async function createResearchDataset(
   input: SaveWorkspaceInput,
-): Promise<ResearchDataset> {
+): Promise<{ id: string; dataset: ResearchDataset }> {
   const sql = await ensureWorkspaceTable();
   if (!sql) {
-    return {
-      ...fallbackDataset,
-      product: input.product,
-      competitors: input.competitors,
-      scenarioUnitsSold: input.scenarioUnitsSold,
-    };
+    throw new Error("DATABASE_URL is not configured");
   }
 
+  const id = crypto.randomUUID();
+
   await sql`
-    insert into product_research_workspaces (
+    insert into product_researches (
       id,
       product,
       competitors,
@@ -134,17 +106,45 @@ export async function saveResearchDataset(
       scenario_units_sold
     )
     values (
-      ${WORKSPACE_ID},
+      ${id},
       ${JSON.stringify(input.product)}::jsonb,
       ${JSON.stringify(input.competitors)}::jsonb,
       ${JSON.stringify([])}::jsonb,
       ${input.scenarioUnitsSold}
     )
-    on conflict (id) do update set
-      product = excluded.product,
-      competitors = excluded.competitors,
-      scenario_units_sold = excluded.scenario_units_sold,
+  `;
+
+  return {
+    id,
+    dataset: withStorage(
+      {
+        product: input.product,
+        competitors: input.competitors,
+        salesLog: [],
+        scenarioUnitsSold: input.scenarioUnitsSold,
+      },
+      "neon",
+    ),
+  };
+}
+
+export async function updateResearchDataset(
+  id: string,
+  input: SaveWorkspaceInput,
+): Promise<ResearchDataset> {
+  const sql = await ensureWorkspaceTable();
+  if (!sql) {
+    throw new Error("DATABASE_URL is not configured");
+  }
+
+  await sql`
+    update product_researches
+    set
+      product = ${JSON.stringify(input.product)}::jsonb,
+      competitors = ${JSON.stringify(input.competitors)}::jsonb,
+      scenario_units_sold = ${input.scenarioUnitsSold},
       updated_at = now()
+    where id = ${id}
   `;
 
   return withStorage(
@@ -156,4 +156,69 @@ export async function saveResearchDataset(
     },
     "neon",
   );
+}
+
+export async function listSavedResearches(): Promise<SavedResearchSummary[]> {
+  const sql = await ensureWorkspaceTable();
+  if (!sql) {
+    return [];
+  }
+
+  const rows = (await sql`
+    select
+      id,
+      product,
+      competitors,
+      sales_log,
+      scenario_units_sold,
+      created_at::text,
+      updated_at::text
+    from product_researches
+    order by updated_at desc
+  `) as WorkspaceRow[];
+
+  return rows.map((row) => {
+    const dataset = mapRowToDataset(row);
+    const model = computeResearchModel(dataset, dataset.scenarioUnitsSold);
+
+    return {
+      id: row.id,
+      productName: dataset.product.productName,
+      supplier: dataset.product.supplier,
+      competitorCount: dataset.competitors.filter((entry) => entry.competitor.trim())
+        .length,
+      recommendedSellPrice: model.pricing.recommendedSellPrice,
+      updatedAt: row.updated_at,
+    };
+  });
+}
+
+export async function getSavedResearchById(
+  id: string,
+): Promise<ResearchDataset | null> {
+  const sql = await ensureWorkspaceTable();
+  if (!sql) {
+    return null;
+  }
+
+  const rows = (await sql`
+    select
+      id,
+      product,
+      competitors,
+      sales_log,
+      scenario_units_sold,
+      created_at::text,
+      updated_at::text
+    from product_researches
+    where id = ${id}
+    limit 1
+  `) as WorkspaceRow[];
+
+  const row = rows[0];
+  if (!row) {
+    return null;
+  }
+
+  return mapRowToDataset(row);
 }

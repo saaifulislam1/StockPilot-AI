@@ -1,4 +1,4 @@
-import { ProductResearchDashboard } from "@/components/product-research-dashboard";
+import { ResearchEditor } from "@/components/research/research-editor";
 import { loadResearchDataset } from "@/lib/research-store";
 
 export const dynamic = "force-dynamic";
@@ -6,5 +6,5 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const dataset = await loadResearchDataset();
 
-  return <ProductResearchDashboard initialDataset={dataset} />;
+  return <ResearchEditor initialDataset={dataset} mode="create" />;
 }

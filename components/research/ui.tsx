@@ -1,0 +1,175 @@
+import { Icon } from "@/components/app-icons";
+
+export function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-BD", {
+    style: "currency",
+    currency: "BDT",
+    maximumFractionDigits: 0,
+  }).format(Math.round(Number.isFinite(value) ? value : 0));
+}
+
+export function formatPercent(value: number) {
+  return `${(value * 100).toFixed(1)}%`;
+}
+
+export function formatDateTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
+export function getTone(status: string) {
+  const lower = status.toLowerCase();
+
+  if (lower.includes("error") || lower.includes("loss") || lower.includes("danger")) {
+    return "border-rose-500/15 bg-rose-500/10 text-rose-700 dark:text-rose-300";
+  }
+
+  if (lower.includes("wait") || lower.includes("thin") || lower.includes("cautious")) {
+    return "border-amber-500/15 bg-amber-500/10 text-amber-700 dark:text-amber-300";
+  }
+
+  return "border-emerald-500/15 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+}
+
+export function ShellCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={`rounded-[2rem] border border-[var(--border)] bg-[var(--surface-strong)] shadow-[0_20px_60px_rgba(15,23,42,0.08)] ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
+export function SectionCard({
+  icon,
+  eyebrow,
+  title,
+  body,
+  children,
+  action,
+}: {
+  icon: React.ReactNode;
+  eyebrow: string;
+  title: string;
+  body: string;
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) {
+  return (
+    <ShellCard className="overflow-hidden">
+      <div className="border-b border-[var(--border)] bg-[var(--surface)] px-6 py-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="rounded-2xl bg-[var(--accent-soft)] p-3 text-[var(--accent-strong)]">
+              {icon}
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.26em] text-[var(--muted)]">
+                {eyebrow}
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--text)]">
+                {title}
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--muted)]">
+                {body}
+              </p>
+            </div>
+          </div>
+          {action}
+        </div>
+      </div>
+      <div className="px-6 py-6">{children}</div>
+    </ShellCard>
+  );
+}
+
+export function HeroPanel({
+  title,
+  body,
+  children,
+}: {
+  title: string;
+  body: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <ShellCard className="overflow-hidden">
+      <div className="bg-[linear-gradient(135deg,var(--surface-strong)_0%,var(--surface)_52%,var(--accent-soft)_100%)] px-6 py-8 sm:px-8">
+        <div className="flex flex-wrap items-start justify-between gap-8">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-1.5 text-xs font-medium uppercase tracking-[0.24em] text-[var(--accent-strong)]">
+              <Icon name="spark" className="h-4 w-4" />
+              Automated Research
+            </div>
+            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-[var(--text)] sm:text-5xl">
+              {title}
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--muted)]">
+              {body}
+            </p>
+          </div>
+          {children}
+        </div>
+      </div>
+    </ShellCard>
+  );
+}
+
+export function MetricTile({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+}) {
+  return (
+    <article className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5">
+      <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
+        {label}
+      </p>
+      <p className="mt-3 text-3xl font-semibold tracking-tight text-[var(--text)]">
+        {value}
+      </p>
+      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{hint}</p>
+    </article>
+  );
+}
+
+export function EmptyState({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="rounded-[1.75rem] border border-dashed border-[var(--border)] bg-[var(--surface)] px-6 py-10 text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-strong)]">
+        {icon}
+      </div>
+      <h3 className="mt-4 text-lg font-semibold text-[var(--text)]">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-[var(--muted)]">{body}</p>
+    </div>
+  );
+}
