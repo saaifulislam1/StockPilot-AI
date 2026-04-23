@@ -314,26 +314,26 @@ export function DecisionPanel({
         </ShellCard>
       </div>
 
-      <details className="group rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 marker:hidden">
-          <div className="flex items-start gap-4">
-            <div className="rounded-2xl bg-[var(--accent-soft)] p-3 text-[var(--accent-strong)]">
+      <details className="group rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:rounded-[2rem]">
+        <summary className="flex cursor-pointer list-none flex-col items-start gap-4 px-4 py-4 marker:hidden sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className="rounded-[1.25rem] bg-[var(--accent-soft)] p-3 text-[var(--accent-strong)] sm:rounded-2xl">
               <Icon name="spark" className="h-5 w-5" />
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
                 Deep dive
               </p>
-              <h3 className="mt-2 text-2xl font-semibold text-[var(--text)]">
+              <h3 className="mt-2 text-xl font-semibold text-[var(--text)] sm:text-2xl">
                 See advanced analysis
               </h3>
-              <p className="mt-2 max-w-3xl text-sm leading-7 text-[var(--muted)]">
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--muted)] sm:leading-7">
                 Expanded pricing, market, cashflow, and strategy metrics from the
                 full research model.
               </p>
             </div>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm font-medium text-[var(--text)]">
+          <span className="inline-flex items-center gap-2 self-start rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm font-medium text-[var(--text)] sm:self-auto">
             Expand
             <Icon
               name="chevron-down"
@@ -342,10 +342,10 @@ export function DecisionPanel({
           </span>
         </summary>
 
-        <div className="border-t border-[var(--border)] px-6 py-6">
+        <div className="border-t border-[var(--border)] px-4 py-4 sm:px-6 sm:py-6">
           <div className="grid gap-6">
             <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-              <ShellCard className="p-6">
+              <ShellCard className="p-4 sm:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-xl font-semibold text-[var(--text)]">
@@ -383,7 +383,7 @@ export function DecisionPanel({
                 </div>
               </ShellCard>
 
-              <ShellCard className="p-6">
+              <ShellCard className="p-4 sm:p-6">
                 <h3 className="text-xl font-semibold text-[var(--text)]">
                   Margin watch
                 </h3>
@@ -429,7 +429,7 @@ export function DecisionPanel({
               </ShellCard>
             </div>
 
-            <ShellCard className="p-6">
+            <ShellCard className="p-4 sm:p-6">
               <h3 className="text-xl font-semibold text-[var(--text)]">Price ladder</h3>
               <div className="mt-5 space-y-3">
                 {[
@@ -529,7 +529,7 @@ export function DecisionPanel({
             </ShellCard>
 
             <div className="grid gap-6 xl:grid-cols-2">
-            <ShellCard className="p-5">
+            <ShellCard className="p-4 sm:p-5">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl bg-[var(--accent-soft)] p-2.5 text-[var(--accent-strong)]">
                   <Icon name="chart" className="h-5 w-5" />
@@ -584,7 +584,7 @@ export function DecisionPanel({
               </div>
             </ShellCard>
 
-            <ShellCard className="p-5">
+            <ShellCard className="p-4 sm:p-5">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl bg-[var(--accent-soft)] p-2.5 text-[var(--accent-strong)]">
                   <Icon name="box" className="h-5 w-5" />
@@ -636,7 +636,7 @@ export function DecisionPanel({
               </div>
             </ShellCard>
 
-            <ShellCard className="p-5">
+            <ShellCard className="p-4 sm:p-5">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl bg-[var(--accent-soft)] p-2.5 text-[var(--accent-strong)]">
                   <Icon name="store" className="h-5 w-5" />
@@ -688,7 +688,7 @@ export function DecisionPanel({
               </div>
             </ShellCard>
 
-            <ShellCard className="p-5">
+            <ShellCard className="p-4 sm:p-5">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl bg-[var(--accent-soft)] p-2.5 text-[var(--accent-strong)]">
                   <Icon name="clock" className="h-5 w-5" />
