@@ -299,12 +299,6 @@ export function computeResearchModel(
       sellPrice: recommendedSellPrice,
     },
     {
-      name: "Manual price test",
-      label: "Use market ceiling",
-      buyCostPerUnit: product.buyingCostPerUnit,
-      sellPrice: product.manualTargetSellPrice,
-    },
-    {
       name: "Defend market low",
       label: "Compete on price",
       buyCostPerUnit: product.buyingCostPerUnit,

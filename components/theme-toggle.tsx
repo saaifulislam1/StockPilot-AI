@@ -37,7 +37,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
+      className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)] sm:px-4 sm:py-2.5"
       aria-label="Toggle theme"
     >
       <Icon name={theme === "light" ? "moon" : "sun"} className="h-4 w-4" />

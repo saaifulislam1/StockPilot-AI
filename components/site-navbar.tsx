@@ -16,14 +16,18 @@ export function SiteNavbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[color:var(--surface-strong)]/94 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-2 text-[var(--text)]">
-            <Icon name="brand" />
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-8 sm:py-4 lg:px-10">
+        <Link href="/" className="flex min-w-0 items-center gap-3">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-2 text-[var(--text)] sm:p-2.5">
+            <Icon name="brand" className="h-5 w-5" />
           </div>
-          <div>
-            <p className="text-sm font-semibold text-[var(--text)]">StockPilot</p>
-            <p className="text-xs text-[var(--muted)]">Product Research</p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-[var(--text)] sm:text-base">
+              StockPilot
+            </p>
+            <p className="truncate text-xs text-[var(--muted)] sm:text-sm">
+              Product Research
+            </p>
           </div>
         </Link>
 
@@ -50,7 +54,7 @@ export function SiteNavbar() {
           })}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <ThemeToggle />
         </div>
       </div>

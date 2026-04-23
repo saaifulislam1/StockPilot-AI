@@ -252,7 +252,7 @@ export function DecisionPanel({
         </ShellCard>
       </div>
 
-      <details className="group rounded-[2rem] border border-[var(--border)] bg-[var(--surface-strong)] shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+      <details className="group rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 marker:hidden">
           <div className="flex items-start gap-4">
             <div className="rounded-2xl bg-[var(--accent-soft)] p-3 text-[var(--accent-strong)]">
@@ -364,9 +364,7 @@ export function DecisionPanel({
                 {[
                   ["Lowest Competitor", model.competitorSummary.lowestCompetitorPrice, "var(--muted-soft)"],
                   ["Market Average", model.competitorSummary.averageCompetitorPrice, "var(--accent)"],
-                  ["Break-even Floor", model.pricing.breakEvenSellPrice, "#fb7185"],
                   ["Recommended Sell", model.pricing.recommendedSellPrice, "#34d399"],
-                  ["Manual Target", model.product.manualTargetSellPrice, "#a78bfa"],
                   ["Highest Competitor", model.competitorSummary.highestCompetitorPrice, "#f59e0b"],
                 ].map(([label, value, color]) => (
                   <div key={String(label)}>
