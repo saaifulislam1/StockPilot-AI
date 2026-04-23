@@ -42,7 +42,7 @@ export function getTone(status: string) {
     return "border-amber-500/15 bg-amber-500/10 text-amber-700 dark:text-amber-300";
   }
 
-  return "border-emerald-500/15 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+  return "border-emerald-500/30 bg-emerald-500/14 text-emerald-800 dark:text-emerald-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]";
 }
 
 export function ShellCard({
@@ -144,7 +144,7 @@ export function MetricTile({
 }: {
   label: string;
   value: string;
-  hint: string;
+  hint: React.ReactNode;
   icon?: React.ReactNode;
 }) {
   return (
@@ -160,7 +160,7 @@ export function MetricTile({
       <p className="mt-3 text-[2rem] font-semibold tracking-tight text-[var(--text)] sm:text-3xl">
         {value}
       </p>
-      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{hint}</p>
+      <div className="mt-2 text-sm leading-6 text-[var(--muted)]">{hint}</div>
     </article>
   );
 }

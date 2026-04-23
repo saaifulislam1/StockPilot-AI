@@ -112,23 +112,32 @@ export function DecisionPanel({
             hint="Suggested sell price from true cost plus target profit."
           />
           <MetricTile
-            label="Facebook Avg Sell Price"
+            label="Market Avg Sell Price"
             value={
-              model.competitorSummary.facebookCompetitors > 0
-                ? ready(model.competitorSummary.facebookAveragePrice, hasData)
+              hasMarketAverage
+                ? ready(model.competitorSummary.averageCompetitorPrice, hasData)
                 : "—"
             }
-            hint="Average listed competitor sell price found on Facebook."
+            hint={
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Icon name="facebook" className="h-3.5 w-3.5 shrink-0 text-[var(--accent-strong)]" />
+                  <span>
+                    Fb avg:{" "}
+                    {model.competitorSummary.facebookCompetitors > 0
+                      ? ready(model.competitorSummary.facebookAveragePrice, hasData)
+                      : "—"}
+                  </span>
+                </div>
+                <div>
+                  Website avg:{" "}
+                  {model.competitorSummary.websiteCompetitors > 0
+                    ? ready(model.competitorSummary.websiteAveragePrice, hasData)
+                    : "—"}
+                </div>
+              </div>
+            }
             icon={<Icon name="facebook" className="h-4 w-4" />}
-          />
-          <MetricTile
-            label="Website Avg Sell Price"
-            value={
-              model.competitorSummary.websiteCompetitors > 0
-                ? ready(model.competitorSummary.websiteAveragePrice, hasData)
-                : "—"
-            }
-            hint="Average listed competitor sell price found on websites."
           />
           <MetricTile
             label="Net Profit @ Market Avg"
