@@ -7,7 +7,8 @@ import { Icon } from "@/components/app-icons";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const links = [
-  { href: "/", label: "New Research", icon: "spark" as const },
+  { href: "/", label: "Home", icon: "brand" as const },
+  { href: "/new-research", label: "New Research", icon: "spark" as const },
   { href: "/saved-products", label: "Saved Products", icon: "list" as const },
 ];
 

@@ -83,14 +83,14 @@ export function CompetitorSection({
                 <div className="grid grid-cols-[0.85fr_1fr_0.8fr_0.75fr_0.8fr_1fr_1.35fr_0.38fr] gap-3">
                   <input
                     type="date"
-                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 text-sm text-[var(--text)]"
                     value={entry.date}
                     onChange={(event) =>
                       onUpdateCompetitor(index, "date", event.target.value)
                     }
                   />
                   <input
-                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 text-sm text-[var(--text)]"
                     value={entry.competitor}
                     placeholder="Rokomari"
                     onChange={(event) =>
@@ -98,7 +98,7 @@ export function CompetitorSection({
                     }
                   />
                   <select
-                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 text-sm text-[var(--text)]"
                     value={entry.channel}
                     onChange={(event) =>
                       onUpdateCompetitor(index, "channel", event.target.value as Channel)
@@ -113,7 +113,7 @@ export function CompetitorSection({
                   <input
                     type="number"
                     required
-                    className={`min-w-0 rounded-lg border bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)] ${
+                    className={`h-10 min-w-0 rounded-lg border bg-[var(--surface-strong)] px-3 text-sm text-[var(--text)] ${
                       entry.listedPrice > 0
                         ? "border-emerald-500/50 focus:border-emerald-600"
                         : "border-[var(--border)] focus:border-[var(--accent)]"
@@ -130,7 +130,7 @@ export function CompetitorSection({
                   />
                   <input
                     type="number"
-                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 text-sm text-[var(--text)]"
                     value={entry.customDeliveryFee === 0 ? "" : entry.customDeliveryFee}
                     placeholder={`Fee ${DEFAULT_COMPETITOR_DELIVERY_FEE}`}
                     onChange={(event) =>
@@ -142,7 +142,7 @@ export function CompetitorSection({
                     }
                   />
                   <input
-                    className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 text-sm text-[var(--text)]"
                     value={entry.notes ?? ""}
                     placeholder="Observed market price"
                     onChange={(event) =>
@@ -150,7 +150,7 @@ export function CompetitorSection({
                     }
                   />
                   <textarea
-                    className="min-h-[44px] min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
+                    className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-[var(--text)]"
                     value={(entry.productLinks ?? []).join("\n")}
                     placeholder={"https://store.com/product-1\nhttps://store.com/product-2"}
                     onChange={(event) =>
@@ -168,9 +168,9 @@ export function CompetitorSection({
                     type="button"
                     onClick={() => onRemoveCompetitor(index)}
                     aria-label="Remove competitor row"
-                    className="inline-flex h-9 w-9 items-center justify-center self-start rounded-md border border-[var(--border)] bg-[var(--surface-strong)] text-[var(--muted)] transition hover:border-rose-400 hover:text-rose-600"
+                    className="inline-flex h-10 w-10 items-center justify-center self-start rounded-xl border border-rose-500/18 bg-rose-500/8 text-rose-500 transition hover:-translate-y-0.5 hover:border-rose-500/35 hover:bg-rose-500/14 hover:text-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
                   >
-                    <Icon name="trash" className="h-3.5 w-3.5" />
+                    <Icon name="trash" className="h-4 w-4" />
                   </button>
                 </div>
                 <div className="mt-3 rounded-lg bg-[var(--accent-soft)] px-3 py-2 text-sm text-[var(--accent-strong)]">

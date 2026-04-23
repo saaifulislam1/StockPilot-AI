@@ -7,6 +7,7 @@ import {
   formatPercent,
   getTone,
   getToneTextStyle,
+  LoadingSpinner,
 } from "@/components/research/ui";
 import { type CompetitorEntry, getAdjustedPrice } from "@/lib/product-research";
 
@@ -248,9 +249,14 @@ export function DecisionPanel({
               type="button"
               onClick={onSave}
               disabled={saveDisabled}
+              aria-busy={saveDisabled && saveLabel.toLowerCase().includes("ing")}
               className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--text)] px-4 py-3 text-sm font-medium text-[var(--bg)] transition hover:opacity-92 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <Icon name="save" className="h-4 w-4" />
+              {saveLabel.toLowerCase().includes("ing") ? (
+                <LoadingSpinner className="h-4 w-4" />
+              ) : (
+                <Icon name="save" className="h-4 w-4" />
+              )}
               {saveLabel}
             </button>
           ) : null}

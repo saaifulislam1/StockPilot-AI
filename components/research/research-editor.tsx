@@ -17,6 +17,7 @@ import {
   type ProductTextKey,
   type ProductValidation,
 } from "@/components/research/product-section";
+import { LoadingSpinner } from "@/components/research/ui";
 import {
   type CompetitorEntry,
   type ProductInputs,
@@ -277,6 +278,8 @@ export function ResearchEditor({
       return;
     }
 
+    setSaveState(mode === "create" ? "Saving..." : "Updating...");
+
     startTransition(async () => {
       try {
         const normalizedCompetitors = normalizeCompetitorsForSave(competitors);
@@ -532,7 +535,11 @@ export function ResearchEditor({
                 disabled={isPending}
                 className="inline-flex items-center gap-2 rounded-full bg-[var(--text)] px-4 py-2 text-sm font-medium text-[var(--bg)] transition hover:opacity-92 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <Icon name="save" className="h-4 w-4" />
+                {isPending ? (
+                  <LoadingSpinner className="h-4 w-4" />
+                ) : (
+                  <Icon name="save" className="h-4 w-4" />
+                )}
                 {isPending ? "Updating..." : "Update Changes"}
               </button>
             </div>

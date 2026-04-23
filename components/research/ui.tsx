@@ -45,22 +45,8 @@ export function getTone(status: string) {
   return "border-emerald-500/40 bg-emerald-500/14 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]";
 }
 
-export function getToneTextStyle(status: string): React.CSSProperties {
-  const lower = status.toLowerCase();
-
-  if (lower.includes("error") || lower.includes("loss") || lower.includes("danger")) {
-    return { color: "#111111" };
-  }
-
-  if (lower.includes("wait") || lower.includes("thin") || lower.includes("cautious")) {
-    return { color: "#111111" };
-  }
-
-  if (lower.includes("need")) {
-    return { color: "#111111" };
-  }
-
-  return { color: "#111111" };
+export function getToneTextStyle(): React.CSSProperties {
+  return { color: "var(--status-pill-text)" };
 }
 
 export function ShellCard({
@@ -76,6 +62,41 @@ export function ShellCard({
     >
       {children}
     </section>
+  );
+}
+
+export function LoadingSpinner({
+  className = "h-4 w-4",
+}: {
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`inline-block animate-spin rounded-full border-2 border-current border-r-transparent ${className}`}
+    />
+  );
+}
+
+export function PageLoadingState({
+  title = "Loading",
+  body = "Please wait while the page data loads.",
+}: {
+  title?: string;
+  body?: string;
+}) {
+  return (
+    <ShellCard className="p-8 sm:p-10">
+      <div className="flex min-h-[280px] flex-col items-center justify-center text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-strong)]">
+          <LoadingSpinner className="h-6 w-6" />
+        </div>
+        <h2 className="mt-5 text-2xl font-semibold tracking-tight text-[var(--text)]">
+          {title}
+        </h2>
+        <p className="mt-2 max-w-md text-sm leading-7 text-[var(--muted)]">{body}</p>
+      </div>
+    </ShellCard>
   );
 }
 
