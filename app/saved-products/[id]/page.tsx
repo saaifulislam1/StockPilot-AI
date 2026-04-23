@@ -3,8 +3,6 @@ import { notFound } from "next/navigation";
 import { ResearchEditor } from "@/components/research/research-editor";
 import { getSavedResearchById } from "@/lib/research-store";
 
-export const dynamic = "force-dynamic";
-
 export default async function SavedProductDetailPage({
   params,
 }: {

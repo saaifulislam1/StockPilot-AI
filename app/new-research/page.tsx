@@ -1,8 +1,6 @@
 import { ResearchEditor } from "@/components/research/research-editor";
 import { loadResearchDataset } from "@/lib/research-store";
 
-export const dynamic = "force-dynamic";
-
 export default async function NewResearchPage() {
   const dataset = await loadResearchDataset();
 

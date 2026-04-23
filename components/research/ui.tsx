@@ -45,7 +45,8 @@ export function getTone(status: string) {
   return "border-emerald-500/40 bg-emerald-500/14 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]";
 }
 
-export function getToneTextStyle(): React.CSSProperties {
+export function getToneTextStyle(status?: string): React.CSSProperties {
+  void status;
   return { color: "var(--status-pill-text)" };
 }
 
@@ -117,7 +118,7 @@ export function SectionCard({
 }) {
   return (
     <ShellCard className="overflow-hidden">
-      <div className="border-b border-[var(--border)] bg-[linear-gradient(180deg,var(--surface-raised)_0%,var(--surface)_100%)] px-4 py-5 sm:px-6 sm:py-6">
+      <div className="border-b border-[var(--border)] bg-[var(--surface-raised)] px-4 py-5 sm:px-6 sm:py-6">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-3 text-[var(--accent-strong)] shadow-[var(--shadow-soft)] sm:rounded-2xl">
@@ -154,7 +155,7 @@ export function HeroPanel({
 }) {
   return (
     <ShellCard className="overflow-hidden">
-      <div className="bg-[linear-gradient(180deg,var(--surface-raised)_0%,var(--surface)_100%)] px-4 py-6 sm:px-8 sm:py-8">
+      <div className="bg-[var(--surface-raised)] px-4 py-6 sm:px-8 sm:py-8">
         <div className="flex flex-wrap items-start justify-between gap-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-medium uppercase tracking-[0.24em] text-[var(--accent-strong)] shadow-[var(--shadow-soft)]">

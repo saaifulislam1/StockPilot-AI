@@ -465,7 +465,22 @@ export function ResearchEditor({
               onUpdateCompetitor={updateCompetitor}
             />
 
-            <div className="flex justify-end">
+            <div className="flex flex-wrap justify-end gap-3">
+              {mode === "detail" && isEditing ? (
+                <button
+                  type="button"
+                  onClick={saveResearch}
+                  disabled={isPending || !canContinue || !hasUnsavedChanges}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text)] shadow-[var(--shadow-soft)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-raised)] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isPending ? (
+                    <LoadingSpinner className="h-4 w-4" />
+                  ) : (
+                    <Icon name="save" className="h-4 w-4" />
+                  )}
+                  {isPending ? "Updating..." : "Update Changes"}
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={reviewAnalysis}
@@ -501,8 +516,8 @@ export function ResearchEditor({
       </div>
 
       {showStopEditModal ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-4">
-          <div className="w-full max-w-md rounded-[1.75rem] border border-[var(--border)] bg-[var(--surface-strong)] p-6 shadow-[0_20px_60px_rgba(15,23,42,0.18)]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/42 px-4 backdrop-blur-[2px]">
+          <div className="w-full max-w-md rounded-[1.75rem] border border-[var(--border)] bg-[var(--surface-raised)] p-6 shadow-[var(--shadow-elevated)]">
             <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
               Unsaved changes
             </p>

@@ -1,4 +1,5 @@
 import { getSql } from "@/lib/db";
+import { cacheLife, cacheTag } from "next/cache";
 import {
   type CompetitorEntry,
   type ProductInputs,
@@ -33,7 +34,15 @@ export type SavedResearchSummary = {
   updatedAt: string;
 };
 
-async function ensureWorkspaceTable() {
+const SAVED_RESEARCHES_TAG = "saved-researches";
+
+function savedResearchTag(id: string) {
+  return `saved-research:${id}`;
+}
+
+let workspaceTablePromise: Promise<ReturnType<typeof getSql>> | null = null;
+
+async function initWorkspaceTable() {
   const sql = getSql();
   if (!sql) {
     return null;
@@ -52,6 +61,14 @@ async function ensureWorkspaceTable() {
   `;
 
   return sql;
+}
+
+async function ensureWorkspaceTable() {
+  if (!workspaceTablePromise) {
+    workspaceTablePromise = initWorkspaceTable();
+  }
+
+  return workspaceTablePromise;
 }
 
 function withStorage(
@@ -159,6 +176,10 @@ export async function updateResearchDataset(
 }
 
 export async function listSavedResearches(): Promise<SavedResearchSummary[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(SAVED_RESEARCHES_TAG);
+
   const sql = await ensureWorkspaceTable();
   if (!sql) {
     return [];
@@ -196,6 +217,10 @@ export async function listSavedResearches(): Promise<SavedResearchSummary[]> {
 export async function getSavedResearchById(
   id: string,
 ): Promise<ResearchDataset | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(SAVED_RESEARCHES_TAG, savedResearchTag(id));
+
   const sql = await ensureWorkspaceTable();
   if (!sql) {
     return null;

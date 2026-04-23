@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 import {
   createResearchDataset,
@@ -8,10 +8,18 @@ import {
   updateResearchDataset,
 } from "@/lib/research-store";
 
+const SAVED_RESEARCHES_TAG = "saved-researches";
+
+function savedResearchTag(id: string) {
+  return `saved-research:${id}`;
+}
+
 export async function createResearchAction(input: SaveWorkspaceInput) {
   const result = await createResearchDataset(input);
-  revalidatePath("/");
+  updateTag(SAVED_RESEARCHES_TAG);
+  updateTag(savedResearchTag(result.id));
   revalidatePath("/saved-products");
+  revalidatePath(`/saved-products/${result.id}`);
 
   return {
     ok: true,
@@ -26,6 +34,8 @@ export async function updateResearchAction(
   input: SaveWorkspaceInput,
 ) {
   const dataset = await updateResearchDataset(id, input);
+  updateTag(SAVED_RESEARCHES_TAG);
+  updateTag(savedResearchTag(id));
   revalidatePath(`/saved-products/${id}`);
   revalidatePath("/saved-products");
 
