@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { SiteNavbar } from "@/components/site-navbar";
 import "./globals.css";
@@ -55,7 +56,15 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--text)]">
-        <SiteNavbar />
+        <Suspense
+          fallback={
+            <div className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface-strong)]">
+              <div className="mx-auto h-[73px] w-full max-w-7xl px-4 sm:h-[81px] sm:px-8 lg:px-10" />
+            </div>
+          }
+        >
+          <SiteNavbar />
+        </Suspense>
         <div className="flex-1">
           <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
             {children}

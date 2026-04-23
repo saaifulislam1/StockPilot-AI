@@ -85,7 +85,7 @@ function withStorage(
 }
 
 export async function loadResearchDataset(): Promise<ResearchDataset> {
-  const sql = await ensureWorkspaceTable();
+  const sql = getSql();
   if (!sql) {
     return fallbackDataset;
   }
