@@ -223,11 +223,6 @@ export function ResearchEditor({
     ensureCompetitorIds(initialDataset.competitors),
   );
   const [showStopEditModal, setShowStopEditModal] = useState(false);
-  const [saveState, setSaveState] = useState(
-    initialDataset.storage.provider === "neon"
-      ? "Ready"
-      : "DATABASE_URL not configured",
-  );
   const [isPending, startTransition] = useTransition();
 
   const model = useMemo(
@@ -311,11 +306,8 @@ export function ResearchEditor({
 
   function saveResearch() {
     if (!canContinue) {
-      setSaveState("Error: complete required fields marked *");
       return;
     }
-
-    setSaveState(mode === "create" ? "Saving..." : "Updating...");
 
     startTransition(async () => {
       try {
@@ -334,7 +326,6 @@ export function ResearchEditor({
             },
             body: JSON.stringify(payload),
           });
-          setSaveState("Saved");
           router.push(`/saved-products/${result.id}`);
           router.refresh();
           return;
@@ -351,7 +342,6 @@ export function ResearchEditor({
           },
           body: JSON.stringify(payload),
         });
-        setSaveState("Updated");
         setSavedProduct(product);
         setSavedProductDrafts(createProductFieldDrafts(product));
         setSavedCompetitors(ensureCompetitorIds(normalizedCompetitors));
@@ -360,10 +350,7 @@ export function ResearchEditor({
         setIsEditing(false);
         setStep("analysis");
         router.refresh();
-      } catch (error) {
-        setSaveState(
-          error instanceof Error && error.message ? error.message : "Save failed",
-        );
+      } catch {
       }
     });
   }
@@ -374,7 +361,6 @@ export function ResearchEditor({
 
   function reviewAnalysis() {
     if (!canContinue) {
-      setSaveState("Error: complete required fields marked *");
       return;
     }
 
@@ -474,11 +460,37 @@ export function ResearchEditor({
                 );
               })}
             </div>
-            <p className={`text-sm font-medium ${canContinue ? "text-emerald-700" : "text-rose-700"}`}>
-              {canContinue
-                ? "Required fields complete."
-                : "Finish required fields to unlock analysis."}
-            </p>
+            {showAnalysis ? (
+              <button
+                type="button"
+                onClick={saveResearch}
+                disabled={
+                  mode === "detail"
+                    ? isPending || !canContinue || !hasUnsavedChanges
+                    : isPending || !canContinue
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--text)] px-5 py-3 text-sm font-medium text-[var(--bg)] transition hover:opacity-92 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isPending ? (
+                  <LoadingSpinner className="h-4 w-4" />
+                ) : (
+                  <Icon name="save" className="h-4 w-4" />
+                )}
+                {mode === "create"
+                  ? isPending
+                    ? "Saving Research..."
+                    : "Save Research"
+                  : isPending
+                    ? "Updating Research..."
+                    : "Update Research"}
+              </button>
+            ) : (
+              <p className={`text-sm font-medium ${canContinue ? "text-emerald-700" : "text-rose-700"}`}>
+                {canContinue
+                  ? "Required fields complete."
+                  : "Finish required fields to unlock analysis."}
+              </p>
+            )}
           </div>
         ) : null}
 
@@ -559,8 +571,11 @@ export function ResearchEditor({
                   ? "Updating Research..."
                   : "Update Research"
             }
-            saveDisabled={isPending || !canContinue}
-            saveStatus={saveState}
+            saveDisabled={
+              mode === "detail"
+                ? isPending || !canContinue || !hasUnsavedChanges
+                : isPending || !canContinue
+            }
           />
         ) : null}
       </div>

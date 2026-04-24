@@ -18,7 +18,6 @@ type DecisionPanelProps = {
   onBack?: () => void;
   saveLabel?: string;
   saveDisabled?: boolean;
-  saveStatus?: string;
 };
 
 function ready(value: number, hasData: boolean) {
@@ -66,7 +65,6 @@ export function DecisionPanel({
   onBack,
   saveLabel = "Save Research",
   saveDisabled = false,
-  saveStatus = "Ready",
 }: DecisionPanelProps) {
   const hasData =
     Boolean(model.product.productName) ||
@@ -241,108 +239,73 @@ export function DecisionPanel({
 
       <div className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <ShellCard className="p-6">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h3 className="text-xl font-semibold text-[var(--text)]">Save this research</h3>
-              <p className="mt-2 text-sm leading-7 text-[var(--muted)]">
-                Save the current product profile and market tracker so it can be opened
-                later from Saved Products.
+          <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
+            Tracked competitors
+          </h4>
+          <div className="mt-3 space-y-3">
+            {competitors.filter((entry) => entry.listedPrice > 0).length === 0 ? (
+              <p className="text-sm text-[var(--muted)]">
+                No competitor rows yet.
               </p>
-            </div>
-            <span
-              className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(saveStatus)}`}
-              style={getToneTextStyle(saveStatus)}
-            >
-              {saveStatus}
-            </span>
-          </div>
-
-          {onSave ? (
-            <button
-              type="button"
-              onClick={onSave}
-              disabled={saveDisabled}
-              aria-busy={saveDisabled && saveLabel.toLowerCase().includes("ing")}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--text)] px-4 py-3 text-sm font-medium text-[var(--bg)] transition hover:opacity-92 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {saveLabel.toLowerCase().includes("ing") ? (
-                <LoadingSpinner className="h-4 w-4" />
-              ) : (
-                <Icon name="save" className="h-4 w-4" />
-              )}
-              {saveLabel}
-            </button>
-          ) : null}
-
-          <div className="mt-6">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-              Tracked competitors
-            </h4>
-            <div className="mt-3 space-y-3">
-              {competitors.filter((entry) => entry.listedPrice > 0).length === 0 ? (
-                <p className="text-sm text-[var(--muted)]">
-                  No competitor rows yet.
-                </p>
-              ) : (
-                competitors
-                  .filter((entry) => entry.listedPrice > 0)
-                  .map((entry, index) => (
-                    <div
-                      key={entry.id ?? `competitor-${index}`}
-                      className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
-                    >
-                      <div className="flex items-center justify-between gap-4">
-                        <div>
-                          <p className="font-medium text-[var(--text)]">
-                            {entry.competitor || "Unnamed competitor"}
-                          </p>
-                          <p className="mt-1 text-sm text-[var(--muted)]">
-                            {entry.channel} • {entry.date}
-                          </p>
-                          {(entry.productLinks ?? []).length > 0 ? (
-                            <div className="mt-3 grid gap-2">
-                              {(entry.productLinks ?? []).map((link, index) => (
-                                <a
-                                  key={link}
-                                  href={link}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--surface-raised)]"
-                                >
-                                  <span className="flex min-w-0 items-center gap-2">
-                                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-strong)]">
-                                      <Icon name="link" className="h-3.5 w-3.5" />
+            ) : (
+              competitors
+                .filter((entry) => entry.listedPrice > 0)
+                .map((entry, index) => (
+                  <div
+                    key={entry.id ?? `competitor-${index}`}
+                    className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="font-medium text-[var(--text)]">
+                          {entry.competitor || "Unnamed competitor"}
+                        </p>
+                        <p className="mt-1 text-sm text-[var(--muted)]">
+                          {entry.channel} • {entry.date}
+                        </p>
+                        {(entry.productLinks ?? []).length > 0 ? (
+                          <div className="mt-3 grid gap-2">
+                            {(entry.productLinks ?? []).map((link, index) => (
+                              <a
+                                key={link}
+                                href={link}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--surface-raised)]"
+                              >
+                                <span className="flex min-w-0 items-center gap-2">
+                                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-strong)]">
+                                    <Icon name="link" className="h-3.5 w-3.5" />
+                                  </span>
+                                  <span className="min-w-0">
+                                    <span className="block truncate font-semibold">
+                                      {getLinkLabel(link, index)}
                                     </span>
-                                    <span className="min-w-0">
-                                      <span className="block truncate font-semibold">
-                                        {getLinkLabel(link, index)}
-                                      </span>
-                                      <span className="block truncate text-xs text-[var(--muted)]">
-                                        {link}
-                                      </span>
+                                    <span className="block truncate text-xs text-[var(--muted)]">
+                                      {link}
                                     </span>
                                   </span>
-                                  <span className="shrink-0 text-[11px] uppercase tracking-[0.18em] text-[var(--accent-strong)]">
-                                    Open
-                                  </span>
-                                </a>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-[var(--muted)]">Adjusted price</p>
-                          <p className="mt-1 font-semibold text-[var(--text)]">
-                            {formatCurrency(
-                              getAdjustedPrice(entry),
-                            )}
-                          </p>
-                        </div>
+                                </span>
+                                <span className="shrink-0 text-[11px] uppercase tracking-[0.18em] text-[var(--accent-strong)]">
+                                  Open
+                                </span>
+                              </a>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-[var(--muted)]">Adjusted price</p>
+                        <p className="mt-1 font-semibold text-[var(--text)]">
+                          {formatCurrency(
+                            getAdjustedPrice(entry),
+                          )}
+                        </p>
                       </div>
                     </div>
-                  ))
-              )}
-            </div>
+                  </div>
+                ))
+            )}
           </div>
         </ShellCard>
       </div>
@@ -796,6 +759,25 @@ export function DecisionPanel({
           </div>
         </div>
       </details>
+
+      {onSave ? (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={saveDisabled}
+            aria-busy={saveDisabled && saveLabel.toLowerCase().includes("ing")}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--text)] px-6 py-3 text-sm font-medium text-[var(--bg)] transition hover:opacity-92 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {saveLabel.toLowerCase().includes("ing") ? (
+              <LoadingSpinner className="h-4 w-4" />
+            ) : (
+              <Icon name="save" className="h-4 w-4" />
+            )}
+            {saveLabel}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
