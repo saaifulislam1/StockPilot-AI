@@ -50,6 +50,10 @@ type UpdateResearchResponse = {
   savedAt: string;
 };
 
+function getResearchActionIconName(label: string) {
+  return label.toLowerCase().includes("update") ? "sync" : "bookmark";
+}
+
 function blankCompetitor(): CompetitorEntry {
   return {
     id: crypto.randomUUID(),
@@ -474,7 +478,12 @@ export function ResearchEditor({
                 {isPending ? (
                   <LoadingSpinner className="h-4 w-4" />
                 ) : (
-                  <Icon name="save" className="h-4 w-4" />
+                  <Icon
+                    name={getResearchActionIconName(
+                      mode === "create" ? "Save Research" : "Update Research",
+                    )}
+                    className="h-4 w-4"
+                  />
                 )}
                 {mode === "create"
                   ? isPending
@@ -538,7 +547,7 @@ export function ResearchEditor({
                   {isPending ? (
                     <LoadingSpinner className="h-4 w-4" />
                   ) : (
-                    <Icon name="save" className="h-4 w-4" />
+                    <Icon name="sync" className="h-4 w-4" />
                   )}
                   {isPending ? "Updating..." : "Update Changes"}
                 </button>
@@ -618,7 +627,7 @@ export function ResearchEditor({
                 {isPending ? (
                   <LoadingSpinner className="h-4 w-4" />
                 ) : (
-                  <Icon name="save" className="h-4 w-4" />
+                  <Icon name="sync" className="h-4 w-4" />
                 )}
                 {isPending ? "Updating..." : "Update Changes"}
               </button>

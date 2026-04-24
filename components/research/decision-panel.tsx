@@ -58,6 +58,10 @@ function getLinkLabel(link: string, index: number) {
   }
 }
 
+function getResearchActionIconName(label: string) {
+  return label.toLowerCase().includes("update") ? "sync" : "bookmark";
+}
+
 export function DecisionPanel({
   competitors,
   model,
@@ -139,14 +143,18 @@ export function DecisionPanel({
                   </span>
                 </div>
                 <div>
-                  Website avg:{" "}
-                  {model.competitorSummary.websiteCompetitors > 0
-                    ? ready(model.competitorSummary.websiteAveragePrice, hasData)
-                    : "—"}
+                  <div className="flex items-center gap-2">
+                    <Icon name="store" className="h-3.5 w-3.5 shrink-0 text-[var(--accent-strong)]" />
+                    <span>
+                      Website avg:{" "}
+                      {model.competitorSummary.websiteCompetitors > 0
+                        ? ready(model.competitorSummary.websiteAveragePrice, hasData)
+                        : "—"}
+                    </span>
+                  </div>
                 </div>
               </div>
             }
-            icon={<Icon name="facebook" className="h-4 w-4" />}
           />
           <MetricTile
             label="Net Profit @ Market Avg"
@@ -772,7 +780,10 @@ export function DecisionPanel({
             {saveLabel.toLowerCase().includes("ing") ? (
               <LoadingSpinner className="h-4 w-4" />
             ) : (
-              <Icon name="save" className="h-4 w-4" />
+              <Icon
+                name={getResearchActionIconName(saveLabel)}
+                className="h-4 w-4"
+              />
             )}
             {saveLabel}
           </button>
