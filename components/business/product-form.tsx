@@ -3,7 +3,11 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { LoadingSpinner, getPrimaryActionButtonClassName } from "@/components/research/ui";
+import {
+  FieldHelpLabel,
+  LoadingSpinner,
+  getPrimaryActionButtonClassName,
+} from "@/components/research/ui";
 
 type ResearchOption = {
   id: string;
@@ -74,7 +78,10 @@ export function ProductForm({
   return (
     <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Product name</span>
+        <FieldHelpLabel
+          label="Product name"
+          help="The live business product you will manage after research is approved."
+        />
         <input
           required
           value={name}
@@ -85,7 +92,10 @@ export function ProductForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">SKU</span>
+        <FieldHelpLabel
+          label="SKU"
+          help="A short internal code for identifying the product across stock, sales, and purchases."
+        />
         <input
           value={sku}
           onChange={(event) => setSku(event.target.value)}
@@ -95,7 +105,10 @@ export function ProductForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Supplier</span>
+        <FieldHelpLabel
+          label="Supplier"
+          help="The main supplier or source you buy this product from."
+        />
         <input
           value={supplier}
           onChange={(event) => setSupplier(event.target.value)}
@@ -105,7 +118,10 @@ export function ProductForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Lifecycle status</span>
+        <FieldHelpLabel
+          label="Lifecycle status"
+          help="The current stage of the product in your business, from research through scaling or stopping."
+        />
         <select
           value={status}
           onChange={(event) => setStatus(event.target.value)}
@@ -123,7 +139,10 @@ export function ProductForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Target sell price</span>
+        <FieldHelpLabel
+          label="Target sell price"
+          help="The intended selling price you want operations and reporting to track against."
+        />
         <input
           type="number"
           min="0"
@@ -134,7 +153,10 @@ export function ProductForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Reorder point</span>
+        <FieldHelpLabel
+          label="Reorder point"
+          help="When on-hand stock falls to this number or below, the product should be reviewed for restocking."
+        />
         <input
           type="number"
           min="0"
@@ -145,7 +167,10 @@ export function ProductForm({
       </label>
 
       <label className="space-y-2 md:col-span-2">
-        <span className="text-sm font-medium text-[var(--text)]">Linked research</span>
+        <FieldHelpLabel
+          label="Linked research"
+          help="Optional link back to the research record that originally justified buying this product."
+        />
         <select
           value={linkedResearchId}
           onChange={(event) => setLinkedResearchId(event.target.value)}
@@ -161,7 +186,10 @@ export function ProductForm({
       </label>
 
       <label className="space-y-2 md:col-span-2">
-        <span className="text-sm font-medium text-[var(--text)]">Notes</span>
+        <FieldHelpLabel
+          label="Notes"
+          help="Internal operating notes such as launch plan, supplier issues, or packaging reminders."
+        />
         <textarea
           value={notes}
           onChange={(event) => setNotes(event.target.value)}

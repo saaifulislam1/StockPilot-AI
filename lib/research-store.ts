@@ -17,9 +17,9 @@ import {
 
 type WorkspaceRow = {
   id: string;
-  product: ProductInputs;
-  competitors: CompetitorEntry[];
-  sales_log: SalesEntry[];
+  product: ProductInputs | string | null;
+  competitors: CompetitorEntry[] | string | null;
+  sales_log: SalesEntry[] | string | null;
   scenario_units_sold: number;
   created_at: string;
   updated_at: string;
@@ -65,6 +65,27 @@ async function initWorkspaceTable() {
   await sql`
     alter table product_researches
     add column if not exists user_id text
+  `;
+
+  await sql`
+    update product_researches
+    set product = (product #>> '{}')::jsonb
+    where jsonb_typeof(product) = 'string'
+      and left(product #>> '{}', 1) = '{'
+  `;
+
+  await sql`
+    update product_researches
+    set competitors = (competitors #>> '{}')::jsonb
+    where jsonb_typeof(competitors) = 'string'
+      and left(competitors #>> '{}', 1) = '['
+  `;
+
+  await sql`
+    update product_researches
+    set sales_log = (sales_log #>> '{}')::jsonb
+    where jsonb_typeof(sales_log) = 'string'
+      and left(sales_log #>> '{}', 1) = '['
   `;
 
   await sql`
@@ -121,6 +142,42 @@ function withStorage(
   };
 }
 
+function parseJsonArray<T>(value: T[] | string | null | undefined) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      return Array.isArray(parsed) ? (parsed as T[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function parseJsonObject<T extends object>(value: T | string | null | undefined) {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return parsed as T;
+      }
+    } catch {
+      return {} as T;
+    }
+  }
+
+  return {} as T;
+}
+
 export async function loadResearchDataset(): Promise<ResearchDataset> {
   const sql = getSql();
   if (!sql) {
@@ -133,9 +190,9 @@ export async function loadResearchDataset(): Promise<ResearchDataset> {
 function mapRowToDataset(row: WorkspaceRow): ResearchDataset {
   return withStorage(
     {
-      product: normalizeProductInputs(row.product),
-      competitors: row.competitors ?? [],
-      salesLog: row.sales_log ?? [],
+      product: normalizeProductInputs(parseJsonObject<ProductInputs>(row.product)),
+      competitors: parseJsonArray<CompetitorEntry>(row.competitors),
+      salesLog: parseJsonArray<SalesEntry>(row.sales_log),
       scenarioUnitsSold: row.scenario_units_sold,
     },
     "neon",
@@ -165,9 +222,9 @@ export async function createResearchDataset(
     values (
       ${id},
       ${userId},
-      ${JSON.stringify(input.product)}::jsonb,
-      ${JSON.stringify(input.competitors)}::jsonb,
-      ${JSON.stringify([])}::jsonb,
+      ${sql.json(input.product)}::jsonb,
+      ${sql.json(input.competitors)}::jsonb,
+      ${sql.json([])}::jsonb,
       ${input.scenarioUnitsSold}
     )
   `;
@@ -199,8 +256,8 @@ export async function updateResearchDataset(
   const rows = await sql`
     update product_researches
     set
-      product = ${JSON.stringify(input.product)}::jsonb,
-      competitors = ${JSON.stringify(input.competitors)}::jsonb,
+      product = ${sql.json(input.product)}::jsonb,
+      competitors = ${sql.json(input.competitors)}::jsonb,
       scenario_units_sold = ${input.scenarioUnitsSold},
       updated_at = now()
     where id = ${id}

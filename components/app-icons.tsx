@@ -6,6 +6,7 @@ import {
   LuBookmark,
   LuChartColumn,
   LuChevronDown,
+  LuCircleHelp,
   LuClock3,
   LuLink,
   LuList,
@@ -42,7 +43,8 @@ type IconName =
   | "chevron-down"
   | "trash"
   | "facebook"
-  | "google";
+  | "google"
+  | "help";
 
 const iconMap: Record<IconName, IconType> = {
   "arrow-right": LuArrowRight,
@@ -55,6 +57,7 @@ const iconMap: Record<IconName, IconType> = {
   edit: LuPencil,
   facebook: FaFacebookF,
   google: FcGoogle,
+  help: LuCircleHelp,
   link: LuLink,
   list: LuList,
   moon: LuMoon,

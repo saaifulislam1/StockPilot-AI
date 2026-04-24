@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
-import { getPrimaryActionButtonClassName, LoadingSpinner } from "@/components/research/ui";
+import {
+  FieldHelpLabel,
+  getPrimaryActionButtonClassName,
+  LoadingSpinner,
+} from "@/components/research/ui";
 
 export function ResetPasswordForm({ token }: { token: string }) {
   const router = useRouter();
@@ -51,7 +55,10 @@ export function ResetPasswordForm({ token }: { token: string }) {
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">New password</span>
+        <FieldHelpLabel
+          label="New password"
+          help="Choose the new password you want to use for future sign-ins."
+        />
         <input
           type="password"
           required
@@ -64,7 +71,10 @@ export function ResetPasswordForm({ token }: { token: string }) {
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Confirm new password</span>
+        <FieldHelpLabel
+          label="Confirm new password"
+          help="Repeat the new password exactly so the reset is applied correctly."
+        />
         <input
           type="password"
           required

@@ -2,7 +2,11 @@
 
 import { FormEvent, useState } from "react";
 
-import { getPrimaryActionButtonClassName, LoadingSpinner } from "@/components/research/ui";
+import {
+  FieldHelpLabel,
+  getPrimaryActionButtonClassName,
+  LoadingSpinner,
+} from "@/components/research/ui";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -38,7 +42,10 @@ export function ForgotPasswordForm() {
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Email</span>
+        <FieldHelpLabel
+          label="Email"
+          help="Enter the email tied to your account so a reset link can be sent if it exists."
+        />
         <input
           type="email"
           required

@@ -3,7 +3,11 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { LoadingSpinner, getPrimaryActionButtonClassName } from "@/components/research/ui";
+import {
+  FieldHelpLabel,
+  LoadingSpinner,
+  getPrimaryActionButtonClassName,
+} from "@/components/research/ui";
 
 type ProductOption = {
   id: string;
@@ -81,7 +85,10 @@ export function PurchaseOrderForm({
   return (
     <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Product</span>
+        <FieldHelpLabel
+          label="Product"
+          help="The business product this supplier order belongs to."
+        />
         <select
           value={productId}
           onChange={(event) => syncSupplier(event.target.value)}
@@ -96,7 +103,10 @@ export function PurchaseOrderForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Supplier</span>
+        <FieldHelpLabel
+          label="Supplier"
+          help="The supplier or source fulfilling this purchase order."
+        />
         <input
           value={supplier}
           onChange={(event) => setSupplier(event.target.value)}
@@ -105,7 +115,10 @@ export function PurchaseOrderForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Status</span>
+        <FieldHelpLabel
+          label="Status"
+          help="Whether the purchase is still planned, already ordered, received into stock, or cancelled."
+        />
         <select
           value={status}
           onChange={(event) => setStatus(event.target.value)}
@@ -119,7 +132,10 @@ export function PurchaseOrderForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Units</span>
+        <FieldHelpLabel
+          label="Units"
+          help="The quantity of units included in this purchase order."
+        />
         <input
           type="number"
           min="1"
@@ -130,7 +146,10 @@ export function PurchaseOrderForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Unit cost</span>
+        <FieldHelpLabel
+          label="Unit cost"
+          help="The buying cost for a single unit from the supplier."
+        />
         <input
           type="number"
           min="0"
@@ -141,7 +160,10 @@ export function PurchaseOrderForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Shipping or import cost</span>
+        <FieldHelpLabel
+          label="Shipping or import cost"
+          help="Extra freight, import, or transport cost attached to this purchase order."
+        />
         <input
           type="number"
           min="0"
@@ -152,7 +174,10 @@ export function PurchaseOrderForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Ordered date</span>
+        <FieldHelpLabel
+          label="Ordered date"
+          help="The date the supplier order was placed."
+        />
         <input
           type="date"
           value={orderedAt}
@@ -162,7 +187,10 @@ export function PurchaseOrderForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Expected delivery</span>
+        <FieldHelpLabel
+          label="Expected delivery"
+          help="The expected date the stock should arrive."
+        />
         <input
           type="date"
           value={expectedAt}
@@ -172,7 +200,10 @@ export function PurchaseOrderForm({
       </label>
 
       <label className="space-y-2 md:col-span-2">
-        <span className="text-sm font-medium text-[var(--text)]">Note</span>
+        <FieldHelpLabel
+          label="Note"
+          help="Extra supplier details like MOQ, payment terms, or quality comments."
+        />
         <textarea
           value={note}
           onChange={(event) => setNote(event.target.value)}

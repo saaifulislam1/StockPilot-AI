@@ -6,7 +6,11 @@ import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 
 import { GoogleAuthButton } from "@/components/auth/google-auth-button";
-import { getPrimaryActionButtonClassName, LoadingSpinner } from "@/components/research/ui";
+import {
+  FieldHelpLabel,
+  getPrimaryActionButtonClassName,
+  LoadingSpinner,
+} from "@/components/research/ui";
 
 export function SignUpForm({
   callbackUrl,
@@ -86,7 +90,10 @@ export function SignUpForm({
       ) : null}
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Name</span>
+        <FieldHelpLabel
+          label="Name"
+          help="The display name shown inside your workspace."
+        />
         <input
           required
           value={name}
@@ -97,7 +104,10 @@ export function SignUpForm({
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Email</span>
+        <FieldHelpLabel
+          label="Email"
+          help="The account email you will use to sign in and receive password reset links."
+        />
         <input
           type="email"
           required
@@ -109,7 +119,10 @@ export function SignUpForm({
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Password</span>
+        <FieldHelpLabel
+          label="Password"
+          help="Create a password with at least 8 characters for your account."
+        />
         <input
           type="password"
           required
@@ -122,7 +135,10 @@ export function SignUpForm({
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Confirm password</span>
+        <FieldHelpLabel
+          label="Confirm password"
+          help="Repeat the same password to confirm there are no typing mistakes."
+        />
         <input
           type="password"
           required

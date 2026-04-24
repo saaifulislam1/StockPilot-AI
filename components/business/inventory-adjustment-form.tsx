@@ -3,7 +3,11 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { LoadingSpinner, getPrimaryActionButtonClassName } from "@/components/research/ui";
+import {
+  FieldHelpLabel,
+  LoadingSpinner,
+  getPrimaryActionButtonClassName,
+} from "@/components/research/ui";
 
 type ProductOption = {
   id: string;
@@ -61,7 +65,10 @@ export function InventoryAdjustmentForm({
   return (
     <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Product</span>
+        <FieldHelpLabel
+          label="Product"
+          help="Choose the product whose stock level you want to change."
+        />
         <select
           value={productId}
           onChange={(event) => setProductId(event.target.value)}
@@ -76,7 +83,10 @@ export function InventoryAdjustmentForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Units change</span>
+        <FieldHelpLabel
+          label="Units change"
+          help="Use a positive number to add stock and a negative number to reduce stock."
+        />
         <input
           type="number"
           value={deltaUnits}
@@ -87,7 +97,10 @@ export function InventoryAdjustmentForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Reason</span>
+        <FieldHelpLabel
+          label="Reason"
+          help="Explain why the stock is changing, such as a restock, manual recount, or damage write-off."
+        />
         <select
           value={reason}
           onChange={(event) => setReason(event.target.value)}
@@ -102,7 +115,10 @@ export function InventoryAdjustmentForm({
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Note</span>
+        <FieldHelpLabel
+          label="Note"
+          help="Optional short context for the adjustment so future reviews are easier."
+        />
         <input
           value={note}
           onChange={(event) => setNote(event.target.value)}

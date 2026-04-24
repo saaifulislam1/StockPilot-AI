@@ -1,6 +1,6 @@
 import type { ProductInputs } from "@/lib/product-research";
 
-import { SectionCard, formatPercent } from "@/components/research/ui";
+import { FieldHelpLabel, SectionCard, formatPercent } from "@/components/research/ui";
 import { Icon } from "@/components/app-icons";
 
 export type ProductTextKey = "productName" | "supplier";
@@ -42,51 +42,70 @@ const numberFields: Array<{
   label: string;
   key: ProductNumberKey;
   placeholder: string;
+  help: string;
   required?: boolean;
 }> = [
   {
     label: "Buying Cost Per Unit (BDT)",
     key: "buyingCostPerUnit",
     placeholder: "1100",
+    help: "The landed buying cost for one unit before delivery, ads, packaging, and returns are added.",
     required: true,
   },
   {
     label: "Transport Cost To Home (BDT)",
     key: "transportationCostToHome",
     placeholder: "200",
+    help: "The one-time transport cost to move the batch from supplier or market to your own location.",
   },
-  { label: "Units Bought", key: "unitsBought", placeholder: "20", required: true },
+  {
+    label: "Units Bought",
+    key: "unitsBought",
+    placeholder: "20",
+    help: "How many units you plan to buy in this batch. It affects total capital required.",
+    required: true,
+  },
   {
     label: "Delivery Cost Per Order (BDT)",
     key: "deliveryCostPerOrder",
     placeholder: "120",
+    help: "Average shipping or courier cost you expect to pay for each fulfilled order.",
     required: true,
   },
   {
     label: "Packaging Cost Per Order (BDT)",
     key: "packagingCostPerOrder",
     placeholder: "30",
+    help: "Average box, poly, tape, inserts, or other packaging cost for one order.",
     required: true,
   },
   {
     label: "Average Ad Cost Per Order (BDT)",
     key: "averageAdCostPerOrder",
     placeholder: "200",
+    help: "Estimated marketing cost needed to generate one successful order.",
     required: true,
   },
   {
     label: "Return Loss Per Failed Order (BDT)",
     key: "returnLossPerFailedOrder",
     placeholder: "80",
+    help: "Expected loss when an order fails or returns, including courier or handling loss.",
     required: true,
   },
   {
     label: "Target Net Profit Per Order (BDT)",
     key: "targetNetProfitPerOrder",
     placeholder: "350",
+    help: "The minimum profit you want to keep after all direct costs are deducted.",
     required: true,
   },
-  { label: "Manual Target Sell Price (BDT)", key: "manualTargetSellPrice", placeholder: "1990" },
+  {
+    label: "Manual Target Sell Price (BDT)",
+    key: "manualTargetSellPrice",
+    placeholder: "1990",
+    help: "Optional override if you want to test a fixed selling price instead of relying only on the recommendation.",
+  },
 ];
 
 function DisplayRow({ label, value }: { label: string; value: string }) {
@@ -112,27 +131,17 @@ function getValidationStyles(required: boolean, valid?: boolean) {
 
 function FieldLabel({
   label,
+  help,
   required = false,
   valid,
 }: {
   label: string;
+  help: string;
   required?: boolean;
   valid?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-sm font-medium text-[var(--text)]">
-        {label}
-        {required ? (
-          <span
-            className={`ml-1 ${valid ? "text-emerald-600" : "text-rose-600"}`}
-            aria-hidden="true"
-          >
-            *
-          </span>
-        ) : null}
-      </span>
-    </div>
+    <FieldHelpLabel label={label} help={help} required={required} valid={valid} />
   );
 }
 
@@ -165,6 +174,7 @@ export function ProductSection({
             <label className="space-y-2">
               <FieldLabel
                 label="Product Name"
+                help="The product you are researching before buying inventory."
                 required={true}
                 valid={validation.productName}
               />
@@ -179,7 +189,10 @@ export function ProductSection({
             </label>
 
             <label className="space-y-2">
-              <FieldLabel label="Supplier / Source" />
+              <FieldLabel
+                label="Supplier / Source"
+                help="Where you will source the product from, such as a wholesaler, factory, or market."
+              />
               <input
                 className={`w-full rounded-2xl border px-4 py-3 text-[var(--text)] outline-none transition ${getValidationStyles(false)}`}
                 value={product.supplier}
@@ -192,6 +205,7 @@ export function ProductSection({
               <label key={field.key} className="space-y-2">
                 <FieldLabel
                   label={field.label}
+                  help={field.help}
                   required={field.required}
                   valid={
                     field.required
@@ -223,6 +237,7 @@ export function ProductSection({
             <label className="space-y-2 sm:col-span-2">
               <FieldLabel
                 label="Failed Order Rate (%)"
+                help="The percentage of orders you expect to fail, cancel, or return. This increases the true selling risk."
                 required={true}
                 valid={validation.failedOrderRate}
               />

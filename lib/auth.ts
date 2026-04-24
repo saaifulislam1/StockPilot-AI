@@ -2,10 +2,11 @@ import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { getServerSession } from "next-auth/next";
+import type { Session } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { getAuthSecret, getGoogleOAuthConfig } from "@/lib/auth-env";
-import { findOrCreateOAuthUser, getUserByEmail } from "@/lib/auth-store";
+import { findOrCreateOAuthUser, getUserByEmail, getUserById } from "@/lib/auth-store";
 import { verifyPassword } from "@/lib/auth-crypto";
 
 const googleOAuthConfig = getGoogleOAuthConfig();
@@ -110,8 +111,20 @@ export const authOptions: NextAuthOptions = {
 
 export const nextAuthHandler = NextAuth(authOptions);
 
-export function auth() {
-  return getServerSession(authOptions);
+export async function auth(): Promise<Session | null> {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return session;
+  }
+
+  const user = await getUserById(userId);
+  if (!user) {
+    return null;
+  }
+
+  return session;
 }
 
 export async function requireUser(redirectTo = "/saved-products") {

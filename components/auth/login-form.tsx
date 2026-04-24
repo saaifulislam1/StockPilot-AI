@@ -6,7 +6,11 @@ import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 
 import { GoogleAuthButton } from "@/components/auth/google-auth-button";
-import { getPrimaryActionButtonClassName, LoadingSpinner } from "@/components/research/ui";
+import {
+  FieldHelpLabel,
+  getPrimaryActionButtonClassName,
+  LoadingSpinner,
+} from "@/components/research/ui";
 
 export function LoginForm({
   callbackUrl,
@@ -58,7 +62,10 @@ export function LoginForm({
       ) : null}
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Email</span>
+        <FieldHelpLabel
+          label="Email"
+          help="The email address used for your account sign-in."
+        />
         <input
           type="email"
           required
@@ -70,7 +77,10 @@ export function LoginForm({
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-[var(--text)]">Password</span>
+        <FieldHelpLabel
+          label="Password"
+          help="Your account password. It is checked only for the email entered above."
+        />
         <input
           type="password"
           required

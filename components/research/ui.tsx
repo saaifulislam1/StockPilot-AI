@@ -83,6 +83,46 @@ export function getPrimaryActionButtonClassName() {
   return "inline-flex items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-white px-5 py-3 text-sm font-medium text-[var(--text)] shadow-[var(--shadow-soft)] transition hover:border-[var(--border-strong)] hover:shadow-[0_10px_24px_rgba(15,23,42,0.06)] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[var(--text)] dark:text-[var(--bg)] dark:hover:border-[var(--border-strong)] dark:hover:shadow-[0_14px_28px_rgba(2,8,23,0.24)]";
 }
 
+export function FieldHelpLabel({
+  label,
+  help,
+  required = false,
+  valid,
+}: {
+  label: string;
+  help: string;
+  required?: boolean;
+  valid?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-medium text-[var(--text)]">
+        {label}
+        {required ? (
+          <span
+            className={`ml-1 ${valid ? "text-emerald-600" : "text-rose-600"}`}
+            aria-hidden="true"
+          >
+            *
+          </span>
+        ) : null}
+      </span>
+      <span className="group relative inline-flex items-center">
+        <span
+          tabIndex={0}
+          aria-label={`${label} help`}
+          className="inline-flex h-5 w-5 cursor-help items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] outline-none transition hover:border-[var(--accent)] hover:text-[var(--accent-strong)] focus:border-[var(--accent)] focus:text-[var(--accent-strong)]"
+        >
+          <Icon name="help" className="h-3.5 w-3.5" />
+        </span>
+        <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden w-60 -translate-x-1/2 rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-xs leading-6 text-[var(--text)] shadow-[var(--shadow-card)] group-hover:block group-focus-within:block">
+          {help}
+        </span>
+      </span>
+    </div>
+  );
+}
+
 export function PageLoadingState({
   title = "Loading",
   body = "Please wait while the page data loads.",

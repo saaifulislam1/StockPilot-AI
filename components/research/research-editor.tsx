@@ -67,12 +67,31 @@ function blankCompetitor(): CompetitorEntry {
   };
 }
 
-function ensureCompetitorIds(entries: CompetitorEntry[]) {
-  if (entries.length === 0) {
+function coerceCompetitorEntries(value: unknown): CompetitorEntry[] {
+  if (Array.isArray(value)) {
+    return value as CompetitorEntry[];
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      return Array.isArray(parsed) ? (parsed as CompetitorEntry[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function ensureCompetitorIds(entries: unknown) {
+  const safeEntries = coerceCompetitorEntries(entries);
+
+  if (safeEntries.length === 0) {
     return [blankCompetitor()];
   }
 
-  return entries.map((entry) => ({
+  return safeEntries.map((entry) => ({
     ...entry,
     id: entry.id ?? crypto.randomUUID(),
     productLinks: normalizeLinks(
