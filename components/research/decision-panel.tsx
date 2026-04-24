@@ -177,7 +177,7 @@ export function DecisionPanel({
         </div>
 
         <div className="mt-6 max-w-3xl rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-4">
-          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--border)] pb-3">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--border)]">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
                 Venture Cost Sheet
@@ -189,11 +189,11 @@ export function DecisionPanel({
                 Upfront cash needed to launch this batch.
               </p>
             </div>
-            <div className="min-w-[170px] rounded-[1rem] border border-[var(--border)] bg-[var(--surface-strong)] px-4 py-2.5 text-right">
+            <div className="px-4 py-2.5 text-right">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--muted)]">
-                Total Due
+                Total Due 
               </p>
-              <p className="mt-1 text-xl font-semibold text-[var(--text)] sm:text-2xl">
+              <p className="mt-1 md:text-[20px]  font-medium text-[var(--text)] sm:text-xl">
                 {ready(model.cashflow.totalCashNeeded, hasData)}
               </p>
             </div>
