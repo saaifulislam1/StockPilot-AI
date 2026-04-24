@@ -4,7 +4,13 @@ import { getToken } from "next-auth/jwt";
 
 import { getAuthSecret } from "@/lib/auth-env";
 
-const PROTECTED_PATHS = ["/new-research", "/saved-products", "/api/research"];
+const PROTECTED_PATHS = [
+  "/new-research",
+  "/saved-products",
+  "/operations",
+  "/api/research",
+  "/api/business",
+];
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -35,5 +41,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/new-research/:path*", "/saved-products/:path*", "/api/research/:path*"],
+  matcher: [
+    "/new-research/:path*",
+    "/saved-products/:path*",
+    "/operations/:path*",
+    "/api/research/:path*",
+    "/api/business/:path*",
+  ],
 };

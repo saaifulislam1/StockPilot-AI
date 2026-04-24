@@ -23,7 +23,7 @@ export async function SiteNavbar() {
               ProfitResearch
             </p>
             <p className="truncate text-xs text-[var(--muted)] sm:text-sm">
-              Pricing Research Workspace
+              Research + Operations OS
             </p>
           </div>
         </Link>

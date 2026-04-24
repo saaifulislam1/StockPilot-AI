@@ -1,5 +1,6 @@
 import { getSql } from "@/lib/db";
 import { cacheLife, cacheTag } from "next/cache";
+import { ensureAuthTables } from "@/lib/auth-store";
 import {
   savedResearchesTag,
   savedResearchTag,
@@ -47,11 +48,7 @@ async function initWorkspaceTable() {
     return null;
   }
 
-  await sql`
-    create table if not exists app_users (
-      id text primary key
-    )
-  `;
+  await ensureAuthTables();
 
   await sql`
     create table if not exists product_researches (

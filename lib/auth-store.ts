@@ -73,7 +73,7 @@ async function initAuthTables() {
   return sql;
 }
 
-async function ensureAuthTables() {
+export async function ensureAuthTables() {
   if (!authTablesPromise) {
     authTablesPromise = initAuthTables();
   }

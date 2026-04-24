@@ -48,12 +48,20 @@ export default async function HomePage() {
               <Icon name="arrow-right" className="h-4 w-4" />
             </Link>
             {isSignedIn ? (
-              <Link
-                href="/saved-products"
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
-              >
-                View saved research
-              </Link>
+              <>
+                <Link
+                  href="/saved-products"
+                  className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
+                >
+                  View saved research
+                </Link>
+                <Link
+                  href="/operations"
+                  className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
+                >
+                  Open operations
+                </Link>
+              </>
             ) : null}
           </div>
           <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5">

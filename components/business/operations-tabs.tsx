@@ -6,28 +6,22 @@ import { usePathname } from "next/navigation";
 import { Icon } from "@/components/app-icons";
 
 const links = [
-  { href: "/", label: "Home", icon: "brand" as const },
-  { href: "/new-research", label: "New Research", icon: "spark" as const },
-  { href: "/saved-products", label: "Saved Research", icon: "list" as const },
-  { href: "/operations", label: "Operations", icon: "chart" as const },
+  { href: "/operations", label: "Overview", icon: "chart" as const },
+  { href: "/operations/products", label: "Products", icon: "store" as const },
+  { href: "/operations/inventory", label: "Inventory", icon: "box" as const },
+  { href: "/operations/sales", label: "Sales", icon: "bookmark" as const },
+  { href: "/operations/purchases", label: "Purchases", icon: "save" as const },
 ];
 
-export function SiteNavLinks({
-  isSignedIn,
-}: {
-  isSignedIn: boolean;
-}) {
+export function OperationsTabs() {
   const pathname = usePathname();
-  const visibleLinks = links.filter((link) =>
-    isSignedIn ? true : link.href !== "/saved-products" && link.href !== "/operations",
-  );
 
   return (
-    <nav className="hidden items-center gap-2 md:flex">
-      {visibleLinks.map((link) => {
+    <div className="flex flex-wrap gap-2">
+      {links.map((link) => {
         const isActive =
           pathname === link.href ||
-          (link.href !== "/" && pathname.startsWith(link.href));
+          (link.href !== "/operations" && pathname.startsWith(`${link.href}/`));
 
         return (
           <Link
@@ -44,6 +38,6 @@ export function SiteNavLinks({
           </Link>
         );
       })}
-    </nav>
+    </div>
   );
 }
