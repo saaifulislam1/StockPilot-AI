@@ -1,4 +1,5 @@
 import type { IconType } from "react-icons";
+import { FcGoogle } from "react-icons/fc";
 import {
   LuArrowDownToLine,
   LuArrowRight,
@@ -40,7 +41,8 @@ type IconName =
   | "link"
   | "chevron-down"
   | "trash"
-  | "facebook";
+  | "facebook"
+  | "google";
 
 const iconMap: Record<IconName, IconType> = {
   "arrow-right": LuArrowRight,
@@ -52,6 +54,7 @@ const iconMap: Record<IconName, IconType> = {
   clock: LuClock3,
   edit: LuPencil,
   facebook: FaFacebookF,
+  google: FcGoogle,
   link: LuLink,
   list: LuList,
   moon: LuMoon,

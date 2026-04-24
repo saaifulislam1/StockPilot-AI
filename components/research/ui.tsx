@@ -79,6 +79,10 @@ export function LoadingSpinner({
   );
 }
 
+export function getPrimaryActionButtonClassName() {
+  return "inline-flex items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-white px-5 py-3 text-sm font-medium text-[var(--text)] shadow-[var(--shadow-soft)] transition hover:border-[var(--border-strong)] hover:shadow-[0_10px_24px_rgba(15,23,42,0.06)] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[var(--text)] dark:text-[var(--bg)] dark:hover:border-[var(--border-strong)] dark:hover:shadow-[0_14px_28px_rgba(2,8,23,0.24)]";
+}
+
 export function PageLoadingState({
   title = "Loading",
   body = "Please wait while the page data loads.",

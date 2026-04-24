@@ -1,3 +1,4 @@
+import { auth } from "@/lib/auth";
 import { revalidateResearchWrite } from "@/lib/research-cache";
 import { errorResponse, parseSaveWorkspaceInput } from "@/lib/research-http";
 import { getSavedResearchById, updateResearchDataset } from "@/lib/research-store";
@@ -7,8 +8,14 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ) {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
+      return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await context.params;
-    const dataset = await getSavedResearchById(id);
+    const dataset = await getSavedResearchById(userId, id);
 
     if (!dataset) {
       return Response.json({ ok: false, error: "Research not found" }, { status: 404 });
@@ -25,11 +32,17 @@ export async function PUT(
   context: { params: Promise<{ id: string }> },
 ) {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
+      return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await context.params;
     const input = await parseSaveWorkspaceInput(request);
-    const dataset = await updateResearchDataset(id, input);
+    const dataset = await updateResearchDataset(userId, id, input);
 
-    revalidateResearchWrite(id);
+    revalidateResearchWrite(userId, id);
 
     return Response.json({
       ok: true,

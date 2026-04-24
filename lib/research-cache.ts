@@ -1,22 +1,24 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 
-export const SAVED_RESEARCHES_TAG = "saved-researches";
-
-export function savedResearchTag(id: string) {
-  return `saved-research:${id}`;
+export function savedResearchesTag(userId: string) {
+  return `saved-researches:${userId}`;
 }
 
-export function revalidateSavedResearches() {
-  revalidateTag(SAVED_RESEARCHES_TAG, "max");
+export function savedResearchTag(userId: string, id: string) {
+  return `saved-research:${userId}:${id}`;
+}
+
+export function revalidateSavedResearches(userId: string) {
+  revalidateTag(savedResearchesTag(userId), "max");
   revalidatePath("/saved-products");
 }
 
-export function revalidateSavedResearch(id: string) {
-  revalidateTag(savedResearchTag(id), "max");
+export function revalidateSavedResearch(userId: string, id: string) {
+  revalidateTag(savedResearchTag(userId, id), "max");
   revalidatePath(`/saved-products/${id}`);
 }
 
-export function revalidateResearchWrite(id: string) {
-  revalidateSavedResearches();
-  revalidateSavedResearch(id);
+export function revalidateResearchWrite(userId: string, id: string) {
+  revalidateSavedResearches(userId);
+  revalidateSavedResearch(userId, id);
 }

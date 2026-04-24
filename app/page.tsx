@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { HeroArtwork, Icon } from "@/components/app-icons";
 import { HeroPanel, MetricTile, SectionCard, ShellCard } from "@/components/research/ui";
+import { auth } from "@/lib/auth";
 
 const steps = [
   {
@@ -27,7 +28,10 @@ const steps = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+  const isSignedIn = Boolean(session?.user?.id);
+
   return (
     <div className="space-y-6">
       <HeroPanel
@@ -43,12 +47,14 @@ export default function HomePage() {
               Start new research
               <Icon name="arrow-right" className="h-4 w-4" />
             </Link>
-            <Link
-              href="/saved-products"
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
-            >
-              View saved products
-            </Link>
+            {isSignedIn ? (
+              <Link
+                href="/saved-products"
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
+              >
+                View saved products
+              </Link>
+            ) : null}
           </div>
           <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5">
             <HeroArtwork />

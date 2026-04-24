@@ -1,3 +1,4 @@
+import { auth } from "@/lib/auth";
 import { revalidateResearchWrite } from "@/lib/research-cache";
 import { errorResponse, parseSaveWorkspaceInput } from "@/lib/research-http";
 import {
@@ -11,12 +12,18 @@ export async function GET(request: Request) {
   const view = url.searchParams.get("view");
 
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
+      return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
+
     if (view === "default") {
       const dataset = await loadResearchDataset();
       return Response.json({ ok: true, dataset });
     }
 
-    const items = await listSavedResearches();
+    const items = await listSavedResearches(userId);
     return Response.json({ ok: true, items });
   } catch (error) {
     return errorResponse(error);
@@ -25,10 +32,16 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const input = await parseSaveWorkspaceInput(request);
-    const result = await createResearchDataset(input);
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
+      return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
 
-    revalidateResearchWrite(result.id);
+    const input = await parseSaveWorkspaceInput(request);
+    const result = await createResearchDataset(userId, input);
+
+    revalidateResearchWrite(userId, result.id);
 
     return Response.json(
       {

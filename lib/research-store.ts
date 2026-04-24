@@ -1,7 +1,7 @@
 import { getSql } from "@/lib/db";
 import { cacheLife, cacheTag } from "next/cache";
 import {
-  SAVED_RESEARCHES_TAG,
+  savedResearchesTag,
   savedResearchTag,
 } from "@/lib/research-cache";
 import {
@@ -48,6 +48,12 @@ async function initWorkspaceTable() {
   }
 
   await sql`
+    create table if not exists app_users (
+      id text primary key
+    )
+  `;
+
+  await sql`
     create table if not exists product_researches (
       id text primary key,
       product jsonb not null,
@@ -57,6 +63,42 @@ async function initWorkspaceTable() {
       created_at timestamptz not null default now(),
       updated_at timestamptz not null default now()
     )
+  `;
+
+  await sql`
+    alter table product_researches
+    add column if not exists user_id text
+  `;
+
+  await sql`
+    delete from product_researches
+    where user_id is not null
+      and not exists (
+        select 1
+        from app_users
+        where app_users.id = product_researches.user_id
+      )
+  `;
+
+  await sql`
+    do $$
+    begin
+      if not exists (
+        select 1
+        from pg_constraint
+        where conname = 'product_researches_user_id_fkey'
+      ) then
+        alter table product_researches
+        add constraint product_researches_user_id_fkey
+        foreign key (user_id) references app_users(id) on delete cascade;
+      end if;
+    end
+    $$;
+  `;
+
+  await sql`
+    create index if not exists product_researches_user_idx
+    on product_researches(user_id, updated_at desc)
   `;
 
   return sql;
@@ -104,6 +146,7 @@ function mapRowToDataset(row: WorkspaceRow): ResearchDataset {
 }
 
 export async function createResearchDataset(
+  userId: string,
   input: SaveWorkspaceInput,
 ): Promise<{ id: string; dataset: ResearchDataset }> {
   const sql = await ensureWorkspaceTable();
@@ -116,6 +159,7 @@ export async function createResearchDataset(
   await sql`
     insert into product_researches (
       id,
+      user_id,
       product,
       competitors,
       sales_log,
@@ -123,6 +167,7 @@ export async function createResearchDataset(
     )
     values (
       ${id},
+      ${userId},
       ${JSON.stringify(input.product)}::jsonb,
       ${JSON.stringify(input.competitors)}::jsonb,
       ${JSON.stringify([])}::jsonb,
@@ -145,6 +190,7 @@ export async function createResearchDataset(
 }
 
 export async function updateResearchDataset(
+  userId: string,
   id: string,
   input: SaveWorkspaceInput,
 ): Promise<ResearchDataset> {
@@ -161,6 +207,7 @@ export async function updateResearchDataset(
       scenario_units_sold = ${input.scenarioUnitsSold},
       updated_at = now()
     where id = ${id}
+      and user_id = ${userId}
     returning id
   `;
 
@@ -179,10 +226,12 @@ export async function updateResearchDataset(
   );
 }
 
-export async function listSavedResearches(): Promise<SavedResearchSummary[]> {
+export async function listSavedResearches(
+  userId: string,
+): Promise<SavedResearchSummary[]> {
   "use cache";
   cacheLife("minutes");
-  cacheTag(SAVED_RESEARCHES_TAG);
+  cacheTag(savedResearchesTag(userId));
 
   const sql = await ensureWorkspaceTable();
   if (!sql) {
@@ -199,6 +248,7 @@ export async function listSavedResearches(): Promise<SavedResearchSummary[]> {
       created_at::text,
       updated_at::text
     from product_researches
+    where user_id = ${userId}
     order by updated_at desc
   `) as WorkspaceRow[];
 
@@ -219,11 +269,12 @@ export async function listSavedResearches(): Promise<SavedResearchSummary[]> {
 }
 
 export async function getSavedResearchById(
+  userId: string,
   id: string,
 ): Promise<ResearchDataset | null> {
   "use cache";
   cacheLife("minutes");
-  cacheTag(SAVED_RESEARCHES_TAG, savedResearchTag(id));
+  cacheTag(savedResearchesTag(userId), savedResearchTag(userId, id));
 
   const sql = await ensureWorkspaceTable();
   if (!sql) {
@@ -241,6 +292,7 @@ export async function getSavedResearchById(
       updated_at::text
     from product_researches
     where id = ${id}
+      and user_id = ${userId}
     limit 1
   `) as WorkspaceRow[];
 
