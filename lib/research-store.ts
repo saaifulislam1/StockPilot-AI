@@ -1,6 +1,10 @@
 import { getSql } from "@/lib/db";
 import { cacheLife, cacheTag } from "next/cache";
 import {
+  SAVED_RESEARCHES_TAG,
+  savedResearchTag,
+} from "@/lib/research-cache";
+import {
   type CompetitorEntry,
   type ProductInputs,
   type ResearchDataset,
@@ -34,12 +38,6 @@ export type SavedResearchSummary = {
   recommendedSellPrice: number;
   updatedAt: string;
 };
-
-const SAVED_RESEARCHES_TAG = "saved-researches";
-
-function savedResearchTag(id: string) {
-  return `saved-research:${id}`;
-}
 
 let workspaceTablePromise: Promise<ReturnType<typeof getSql>> | null = null;
 
@@ -155,7 +153,7 @@ export async function updateResearchDataset(
     throw new Error("DATABASE_URL is not configured");
   }
 
-  await sql`
+  const rows = await sql`
     update product_researches
     set
       product = ${JSON.stringify(input.product)}::jsonb,
@@ -163,7 +161,12 @@ export async function updateResearchDataset(
       scenario_units_sold = ${input.scenarioUnitsSold},
       updated_at = now()
     where id = ${id}
+    returning id
   `;
+
+  if (rows.length === 0) {
+    throw new Error("Research not found");
+  }
 
   return withStorage(
     {

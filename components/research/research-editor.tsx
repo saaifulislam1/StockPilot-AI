@@ -3,10 +3,6 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import {
-  createResearchAction,
-  updateResearchAction,
-} from "@/app/actions";
 import { Icon } from "@/components/app-icons";
 import { CompetitorSection } from "@/components/research/competitor-section";
 import { DecisionPanel } from "@/components/research/decision-panel";
@@ -34,6 +30,25 @@ type ResearchEditorProps = {
 };
 
 type ResearchStep = "inputs" | "analysis";
+
+type SavePayload = {
+  product: ProductInputs;
+  competitors: CompetitorEntry[];
+  scenarioUnitsSold: number;
+};
+
+type CreateResearchResponse = {
+  ok: true;
+  id: string;
+  provider: ResearchDataset["storage"]["provider"];
+  savedAt: string;
+};
+
+type UpdateResearchResponse = {
+  ok: true;
+  provider: ResearchDataset["storage"]["provider"];
+  savedAt: string;
+};
 
 function blankCompetitor(): CompetitorEntry {
   return {
@@ -166,6 +181,19 @@ function createEditorSnapshot(product: ProductInputs, competitors: CompetitorEnt
   });
 }
 
+async function requestJson<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
+  const response = await fetch(input, init);
+  const payload = (await response.json().catch(() => null)) as
+    | { error?: string }
+    | null;
+
+  if (!response.ok) {
+    throw new Error(payload?.error ?? "Request failed");
+  }
+
+  return payload as T;
+}
+
 export function ResearchEditor({
   initialDataset,
   mode,
@@ -292,14 +320,20 @@ export function ResearchEditor({
     startTransition(async () => {
       try {
         const normalizedCompetitors = normalizeCompetitorsForSave(competitors);
-        const payload = {
+        const payload: SavePayload = {
           product,
           competitors: normalizedCompetitors,
           scenarioUnitsSold: product.unitsBought,
         };
 
         if (mode === "create") {
-          const result = await createResearchAction(payload);
+          const result = await requestJson<CreateResearchResponse>("/api/research", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
           setSaveState("Saved");
           router.push(`/saved-products/${result.id}`);
           router.refresh();
@@ -310,7 +344,13 @@ export function ResearchEditor({
           throw new Error("Missing research id");
         }
 
-        await updateResearchAction(researchId, payload);
+        await requestJson<UpdateResearchResponse>(`/api/research/${researchId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
         setSaveState("Updated");
         setSavedProduct(product);
         setSavedProductDrafts(createProductFieldDrafts(product));
@@ -320,8 +360,10 @@ export function ResearchEditor({
         setIsEditing(false);
         setStep("analysis");
         router.refresh();
-      } catch {
-        setSaveState("Save failed");
+      } catch (error) {
+        setSaveState(
+          error instanceof Error && error.message ? error.message : "Save failed",
+        );
       }
     });
   }
@@ -399,23 +441,22 @@ export function ResearchEditor({
 
                 return (
                   <div key={stage.stepKey} className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => goToStep(stage.stepKey)}
-                      disabled={stage.disabled}
-                      className="flex items-center gap-3 text-left transition disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <span
+                    <div className="flex items-center gap-3 text-left">
+                      <button
+                        type="button"
+                        onClick={() => goToStep(stage.stepKey)}
+                        disabled={stage.disabled}
+                        aria-label={`Go to ${stage.title}`}
                         className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-semibold ${
                           active
                             ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent-strong)]"
                             : stage.complete
                               ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
                               : "border-[var(--border)] bg-[var(--surface-strong)] text-[var(--muted)]"
-                        }`}
+                        } cursor-pointer transition disabled:cursor-not-allowed disabled:opacity-60`}
                       >
                         {stage.number}
-                      </span>
+                      </button>
                       <div>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
                           Step {stage.number}
@@ -424,7 +465,7 @@ export function ResearchEditor({
                           {stage.title}
                         </p>
                       </div>
-                    </button>
+                    </div>
 
                     {stage.stepKey === "inputs" ? (
                       <div className="hidden h-px w-10 bg-[var(--border)] sm:block" />

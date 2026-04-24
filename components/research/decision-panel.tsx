@@ -83,7 +83,7 @@ export function DecisionPanel({
       <SectionCard
         icon={<Icon name="chart" />}
         eyebrow="Automated Output"
-        title="Basic analysis"
+        title="Hot analysis"
         body="Start with the key pricing and profit signals. Open the expanded view for the full breakdown."
         action={
           onBack ? (
