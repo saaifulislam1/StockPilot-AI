@@ -20,10 +20,10 @@ export async function SiteNavbar() {
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-[var(--text)] sm:text-base">
-              StockPilot
+              ProfitResearch
             </p>
             <p className="truncate text-xs text-[var(--muted)] sm:text-sm">
-              Product Research
+              Pricing Research Workspace
             </p>
           </div>
         </Link>

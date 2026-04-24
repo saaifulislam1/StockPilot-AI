@@ -22,7 +22,7 @@ export function AuthShell({
         <div className="border-b border-[var(--border)] bg-[var(--surface-raised)] px-6 py-6 sm:px-8">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-[var(--muted)]">
             <Icon name="brand" className="h-4 w-4" />
-            StockPilot
+            ProfitResearch
           </Link>
           <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted)]">
             {eyebrow}

@@ -35,8 +35,8 @@ export default async function HomePage() {
   return (
     <div className="space-y-6">
       <HeroPanel
-        title="Understand the market before you buy stock."
-        body="StockPilot is a product research workspace for operators who need to know the real sell price, total cash required, and margin headroom before launching a batch."
+        title="Research product profitability before you launch."
+        body="ProfitResearch helps you compare competitor prices, calculate the real batch cost, and decide whether a product has enough margin to launch, hold, or reject."
       >
         <div className="flex w-full max-w-[480px] flex-col gap-4">
           <div className="flex flex-wrap gap-3">
@@ -52,7 +52,7 @@ export default async function HomePage() {
                 href="/saved-products"
                 className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
               >
-                View saved products
+                View saved research
               </Link>
             ) : null}
           </div>
@@ -65,19 +65,19 @@ export default async function HomePage() {
       <div className="grid gap-4 md:grid-cols-3">
         <MetricTile
           label="What it solves"
-          value="Before stock"
-          hint="Find out whether the product can survive realistic ad, packaging, delivery, and failed-order costs."
+          value="Launch clarity"
+          hint="See whether a product can survive ad cost, packaging, delivery, failed orders, and market pressure before you spend on inventory."
         />
         <MetricTile
           label="What you compare"
           value="FB + Website"
-          hint="Track Facebook and website pricing separately while still getting one market-average decision view."
+          hint="Track Facebook and website prices separately while still getting one market-average view for the final pricing decision."
           icon={<Icon name="facebook" className="h-4 w-4" />}
         />
         <MetricTile
           label="What you decide"
-          value="Price or pass"
-          hint="Use the model to set a recommended sell price, see expected profit, and decide whether the batch is worth funding."
+          value="Launch or pass"
+          hint="Use the model to set a recommended sell price, estimate profit, and decide whether the product deserves capital."
         />
       </div>
 
@@ -106,8 +106,8 @@ export default async function HomePage() {
       <SectionCard
         icon={<Icon name="spark" className="h-5 w-5" />}
         eyebrow="Why teams use it"
-        title="One research record keeps the whole pricing story together"
-        body="Instead of juggling supplier notes, market screenshots, and spreadsheet formulas, each product gets one record with the manual inputs, competitor tracking, and final decision view in the same place."
+        title="One research record keeps the full decision in one place"
+        body="Instead of splitting supplier cost notes, competitor links, and pricing math across chats and spreadsheets, each product gets one record with inputs, tracked competition, and the final launch view."
         action={
           <Link
             href="/new-research"

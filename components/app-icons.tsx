@@ -117,107 +117,81 @@ export function HeroArtwork() {
         fill="url(#heroStage)"
         stroke="var(--border)"
       />
-      <circle cx="424" cy="88" r="92" fill="url(#heroGlow)" />
+      <circle cx="404" cy="108" r="92" fill="url(#heroGlow)" />
 
       <rect
         x="64"
         y="64"
-        width="302"
-        height="204"
+        width="262"
+        height="224"
         rx="28"
         fill="url(#heroPanel)"
         stroke="var(--border)"
       />
-      <rect x="92" y="92" width="88" height="22" rx="11" fill="var(--accent-soft)" />
-      <rect
-        x="190"
-        y="94"
-        width="70"
-        height="18"
-        rx="9"
-        fill="var(--surface-strong)"
-      />
-      <rect
-        x="92"
-        y="130"
-        width="240"
-        height="12"
-        rx="6"
-        fill="var(--surface-strong)"
-        opacity="0.85"
-      />
-      <rect
-        x="92"
-        y="154"
-        width="188"
-        height="12"
-        rx="6"
-        fill="var(--surface-strong)"
-        opacity="0.55"
-      />
+      <text x="92" y="96" fill="var(--muted)" fontSize="11" letterSpacing="2.8">
+        COMPETITOR SNAPSHOT
+      </text>
+      <text x="92" y="126" fill="var(--text)" fontSize="24" fontWeight="600">
+        Market pricing
+      </text>
 
-      <rect x="92" y="192" width="92" height="48" rx="18" fill="var(--accent-soft)" />
-      <rect
-        x="198"
-        y="192"
-        width="74"
-        height="48"
-        rx="18"
-        fill="var(--surface-strong)"
-      />
-      <rect
-        x="286"
-        y="192"
-        width="46"
-        height="48"
-        rx="18"
-        fill="var(--surface-strong)"
-      />
-      <rect x="108" y="206" width="32" height="20" rx="10" fill="url(#heroAccent)" />
-      <rect x="210" y="206" width="48" height="20" rx="10" fill="var(--surface)" />
+      <rect x="92" y="150" width="206" height="44" rx="18" fill="var(--surface)" />
+      <text x="110" y="168" fill="var(--muted)" fontSize="10" letterSpacing="1.8">
+        WEBSITE AVG
+      </text>
+      <text x="110" y="184" fill="var(--text)" fontSize="20" fontWeight="600">
+        BDT 1,780
+      </text>
+      <rect x="240" y="162" width="38" height="20" rx="10" fill="var(--accent-soft)" />
 
-      <rect
-        x="362"
-        y="98"
-        width="118"
-        height="154"
-        rx="26"
-        fill="var(--surface)"
-        stroke="var(--border)"
-      />
-      <rect x="386" y="124" width="70" height="12" rx="6" fill="var(--surface-strong)" />
-      <rect x="386" y="152" width="46" height="46" rx="16" fill="url(#heroWarm)" />
-      <rect x="438" y="152" width="18" height="46" rx="9" fill="var(--surface-strong)" />
-      <rect x="386" y="214" width="70" height="10" rx="5" fill="var(--accent-soft)" />
+      <rect x="92" y="206" width="206" height="44" rx="18" fill="var(--surface)" />
+      <text x="110" y="224" fill="var(--muted)" fontSize="10" letterSpacing="1.8">
+        FACEBOOK AVG
+      </text>
+      <text x="110" y="240" fill="var(--text)" fontSize="20" fontWeight="600">
+        BDT 1,640
+      </text>
+      <rect x="228" y="218" width="50" height="20" rx="10" fill="url(#heroWarm)" />
+
+      <rect x="336" y="78" width="136" height="126" rx="26" fill="var(--surface)" stroke="var(--border)" />
+      <text x="360" y="108" fill="var(--muted)" fontSize="10" letterSpacing="1.8">
+        TARGET MARGIN
+      </text>
+      <text x="360" y="154" fill="var(--text)" fontSize="38" fontWeight="700">
+        34%
+      </text>
+      <rect x="360" y="168" width="88" height="12" rx="6" fill="var(--surface-strong)" />
+      <rect x="360" y="168" width="58" height="12" rx="6" fill="url(#heroAccent)" />
+
+      <rect x="316" y="224" width="166" height="102" rx="28" fill="var(--surface)" stroke="var(--border)" />
+      <text x="336" y="254" fill="var(--muted)" fontSize="10" letterSpacing="1.8">
+        LAUNCH BUDGET
+      </text>
+      <text x="336" y="290" fill="var(--text)" fontSize="24" fontWeight="700">
+        BDT 40,800
+      </text>
+      <text x="336" y="310" fill="var(--muted)" fontSize="9" letterSpacing="0.2">
+        Upfront cash for first batch
+      </text>
 
       <path
-        d="M380 270c20 0 38-9 51-24l34-39c10-12 16-28 16-44v-9"
+        d="M118 332c24 0 45-5 63-15 17-10 32-22 45-36 19-20 39-35 58-45 24-11 51-16 84-16"
         fill="none"
         stroke="var(--accent-soft)"
         strokeWidth="16"
         strokeLinecap="round"
+        opacity="0.9"
       />
-      <circle cx="482" cy="130" r="38" fill="url(#heroAccent)" />
-      <path d="M464 130h36" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
-      <path d="M482 112v36" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+      <circle cx="366" cy="220" r="10" fill="url(#heroAccent)" />
+      <circle cx="418" cy="207" r="13" fill="url(#heroWarm)" />
 
-      <rect
-        x="92"
-        y="294"
-        width="356"
-        height="66"
-        rx="26"
-        fill="var(--surface)"
-        stroke="var(--border)"
-      />
-      <text x="118" y="320" fill="var(--muted)" fontSize="11" letterSpacing="2.8">
-        TRACKED METRICS
+      <rect x="92" y="310" width="176" height="50" rx="22" fill="var(--surface)" stroke="var(--border)" />
+      <text x="114" y="331" fill="var(--muted)" fontSize="10" letterSpacing="2">
+        DECISION VIEW
       </text>
-      <text x="118" y="346" fill="var(--text)" fontSize="24" fontWeight="600">
-        Price, margin, and demand signals
+      <text x="114" y="349" fill="var(--text)" fontSize="11.5" fontWeight="600">
+        Track prices. Hold margin.
       </text>
-      <rect x="372" y="310" width="52" height="34" rx="17" fill="var(--surface-strong)" />
-      <rect x="387" y="320" width="22" height="14" rx="7" fill="url(#heroAccent)" />
     </svg>
   );
 }

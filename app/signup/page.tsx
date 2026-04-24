@@ -23,8 +23,8 @@ export default async function SignUpPage({
   return (
     <AuthShell
       eyebrow="Signup"
-      title="Create your StockPilot account"
-      body="Your research records stay private to your account. Create an account and start using the app right away."
+      title="Create your ProfitResearch account"
+      body="Your product research, competitor tracking, and pricing decisions stay private to your account."
       footer={
         <p className="text-sm text-[var(--muted)]">
           Already registered?{" "}

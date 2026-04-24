@@ -16,9 +16,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Inventory Research OS",
+  title: "ProfitResearch",
   description:
-    "A product research workspace for evaluating sourcing cost, market pricing, failed-order risk, and inventory profitability before stocking.",
+    "Research product profitability, compare competitor pricing, and decide whether a product is worth launching before you buy stock.",
 };
 
 const pageTheme = {
