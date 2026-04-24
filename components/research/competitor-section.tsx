@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 import {
   DEFAULT_COMPETITOR_DELIVERY_FEE,
   type Channel,
@@ -25,6 +29,105 @@ type CompetitorSectionProps = {
 };
 
 const channels: Channel[] = ["Website", "Facebook", "Marketplace", "Retail"];
+
+function parseProductLinksInput(value: string) {
+  return value
+    .split(/[\n,]/)
+    .map((link) => link.trim())
+    .filter(Boolean);
+}
+
+function mergeLinks(existingLinks: string[], incomingValue: string) {
+  return Array.from(new Set([...existingLinks, ...parseProductLinksInput(incomingValue)]));
+}
+
+function getLinkLabel(link: string, index: number) {
+  try {
+    const hostname = new URL(link).hostname.replace(/^www\./, "");
+    return `${hostname} · Link ${index + 1}`;
+  } catch {
+    return `Link ${index + 1}`;
+  }
+}
+
+function ProductLinksField({
+  links,
+  onChange,
+}: {
+  links: string[];
+  onChange: (links: string[]) => void;
+}) {
+  const [draft, setDraft] = useState("");
+
+  function addDraftLinks() {
+    const nextLinks = mergeLinks(links, draft);
+    if (nextLinks.length === links.length) {
+      setDraft("");
+      return;
+    }
+
+    onChange(nextLinks);
+    setDraft("");
+  }
+
+  function removeLink(linkToRemove: string) {
+    onChange(links.filter((link) => link !== linkToRemove));
+  }
+
+  return (
+    <div className="min-w-0 space-y-2">
+      <div className="flex items-center gap-2">
+        <input
+          className="h-10 min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 text-sm text-[var(--text)] shadow-[var(--shadow-soft)]"
+          value={draft}
+          placeholder="Paste a product page link"
+          onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key !== "Enter") {
+              return;
+            }
+
+            event.preventDefault();
+            addDraftLinks();
+          }}
+        />
+        <button
+          type="button"
+          onClick={addDraftLinks}
+          disabled={!draft.trim()}
+          className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 text-sm font-medium text-[var(--text)] shadow-[var(--shadow-soft)] transition hover:border-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Add
+        </button>
+      </div>
+
+      {(links ?? []).length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {links.map((link, index) => (
+            <div
+              key={link}
+              className="inline-flex max-w-full items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-1.5 text-xs text-[var(--text)]"
+            >
+              <span className="truncate">{getLinkLabel(link, index)}</span>
+              <button
+                type="button"
+                onClick={() => removeLink(link)}
+                aria-label={`Remove ${getLinkLabel(link, index)}`}
+                className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-rose-500 transition hover:bg-rose-500/10"
+              >
+                <Icon name="trash" className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-[var(--muted)]">
+          Add one or more product URLs to monitor this competitor.
+        </p>
+      )}
+    </div>
+  );
+}
 
 export function CompetitorSection({
   competitors,
@@ -149,19 +252,10 @@ export function CompetitorSection({
                       onUpdateCompetitor(index, "notes", event.target.value)
                     }
                   />
-                  <textarea
-                    className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-2 text-sm text-[var(--text)] shadow-[var(--shadow-soft)]"
-                    value={(entry.productLinks ?? []).join("\n")}
-                    placeholder={"https://store.com/product-1\nhttps://store.com/product-2"}
-                    onChange={(event) =>
-                      onUpdateCompetitor(
-                        index,
-                        "productLinks",
-                        event.target.value
-                          .split("\n")
-                          .map((link) => link.trim())
-                          .filter(Boolean),
-                      )
+                  <ProductLinksField
+                    links={entry.productLinks ?? []}
+                    onChange={(links) =>
+                      onUpdateCompetitor(index, "productLinks", links)
                     }
                   />
                   <button
@@ -174,8 +268,15 @@ export function CompetitorSection({
                   </button>
                 </div>
                 <div className="mt-3 rounded-lg bg-[var(--accent-soft)] px-3 py-2 text-sm text-[var(--accent-strong)]">
-                  Adjusted market price:{" "}
-                  {formatCurrency(getAdjustedPrice(entry))}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span>
+                      Adjusted market price: {formatCurrency(getAdjustedPrice(entry))}
+                    </span>
+                    <span className="text-xs font-medium uppercase tracking-[0.18em]">
+                      {(entry.productLinks ?? []).length} tracked link
+                      {(entry.productLinks ?? []).length === 1 ? "" : "s"}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -183,9 +284,9 @@ export function CompetitorSection({
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
-          {visibleRows.map((entry) => (
+          {visibleRows.map((entry, index) => (
             <article
-              key={`${entry.date}-${entry.competitor}-${entry.listedPrice}`}
+              key={entry.id ?? `competitor-${index}`}
               className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5"
             >
               <div className="flex items-start justify-between gap-4">
@@ -210,18 +311,32 @@ export function CompetitorSection({
                 </div>
                 <div>
                   <p className="text-sm text-[var(--muted)]">Product pages</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-2 grid gap-2">
                     {(entry.productLinks ?? []).length > 0 ? (
-                      (entry.productLinks ?? []).map((link) => (
+                      (entry.productLinks ?? []).map((link, index) => (
                         <a
                           key={link}
                           href={link}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-1.5 text-sm font-medium text-[var(--accent-strong)] transition hover:border-[var(--accent)]"
+                          className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--surface-raised)]"
                         >
-                          <Icon name="link" className="h-4 w-4" />
-                          Open page
+                          <span className="flex min-w-0 items-center gap-2">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-strong)]">
+                              <Icon name="link" className="h-4 w-4" />
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block truncate font-semibold">
+                                {getLinkLabel(link, index)}
+                              </span>
+                              <span className="block truncate text-xs text-[var(--muted)]">
+                                {link}
+                              </span>
+                            </span>
+                          </span>
+                          <span className="shrink-0 text-xs uppercase tracking-[0.18em] text-[var(--accent-strong)]">
+                            Open
+                          </span>
                         </a>
                       ))
                     ) : (

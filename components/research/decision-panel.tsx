@@ -50,6 +50,15 @@ function AnalysisList({
   );
 }
 
+function getLinkLabel(link: string, index: number) {
+  try {
+    const hostname = new URL(link).hostname.replace(/^www\./, "");
+    return `${hostname} · Link ${index + 1}`;
+  } catch {
+    return `Link ${index + 1}`;
+  }
+}
+
 export function DecisionPanel({
   competitors,
   model,
@@ -277,9 +286,9 @@ export function DecisionPanel({
               ) : (
                 competitors
                   .filter((entry) => entry.listedPrice > 0)
-                  .map((entry) => (
+                  .map((entry, index) => (
                     <div
-                      key={`${entry.date}-${entry.competitor}-${entry.listedPrice}`}
+                      key={entry.id ?? `competitor-${index}`}
                       className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
                     >
                       <div className="flex items-center justify-between gap-4">
@@ -291,17 +300,31 @@ export function DecisionPanel({
                             {entry.channel} • {entry.date}
                           </p>
                           {(entry.productLinks ?? []).length > 0 ? (
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {(entry.productLinks ?? []).map((link) => (
+                            <div className="mt-3 grid gap-2">
+                              {(entry.productLinks ?? []).map((link, index) => (
                                 <a
                                   key={link}
                                   href={link}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-1.5 text-xs font-medium text-[var(--accent-strong)] transition hover:border-[var(--accent)]"
+                                  className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-3 text-sm font-medium text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--surface-raised)]"
                                 >
-                                  <Icon name="link" className="h-3.5 w-3.5" />
-                                  Product page
+                                  <span className="flex min-w-0 items-center gap-2">
+                                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-strong)]">
+                                      <Icon name="link" className="h-3.5 w-3.5" />
+                                    </span>
+                                    <span className="min-w-0">
+                                      <span className="block truncate font-semibold">
+                                        {getLinkLabel(link, index)}
+                                      </span>
+                                      <span className="block truncate text-xs text-[var(--muted)]">
+                                        {link}
+                                      </span>
+                                    </span>
+                                  </span>
+                                  <span className="shrink-0 text-[11px] uppercase tracking-[0.18em] text-[var(--accent-strong)]">
+                                    Open
+                                  </span>
                                 </a>
                               ))}
                             </div>
