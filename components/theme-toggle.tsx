@@ -47,7 +47,7 @@ export function ThemeToggle() {
       aria-label="Toggle theme"
     >
       <Icon name={theme === "light" ? "moon" : "sun"} className="h-4 w-4" />
-      {theme === "light" ? "Dark" : "Light"}
+      <span className="hidden sm:inline">{theme === "light" ? "Dark" : "Light"}</span>
     </button>
   );
 }

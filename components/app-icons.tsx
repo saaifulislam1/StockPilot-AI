@@ -10,6 +10,7 @@ import {
   LuClock3,
   LuLink,
   LuList,
+  LuMenu,
   LuMoon,
   LuPackage,
   LuPencil,
@@ -19,6 +20,7 @@ import {
   LuStore,
   LuSun,
   LuTrash2,
+  LuX,
 } from "react-icons/lu";
 import { FaFacebookF } from "react-icons/fa6";
 import { HiOutlinePresentationChartLine } from "react-icons/hi2";
@@ -34,6 +36,7 @@ type IconName =
   | "box"
   | "chart"
   | "list"
+  | "menu"
   | "edit"
   | "sync"
   | "arrow-right"
@@ -42,6 +45,7 @@ type IconName =
   | "link"
   | "chevron-down"
   | "trash"
+  | "x"
   | "facebook"
   | "google"
   | "help";
@@ -60,6 +64,7 @@ const iconMap: Record<IconName, IconType> = {
   help: LuCircleHelp,
   link: LuLink,
   list: LuList,
+  menu: LuMenu,
   moon: LuMoon,
   plus: LuPlus,
   save: LuArrowDownToLine,
@@ -68,6 +73,7 @@ const iconMap: Record<IconName, IconType> = {
   sun: LuSun,
   sync: LuRefreshCw,
   trash: LuTrash2,
+  x: LuX,
 };
 
 export function Icon({

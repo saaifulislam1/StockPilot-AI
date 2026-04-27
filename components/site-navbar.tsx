@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Icon } from "@/components/app-icons";
+import { SiteMobileMenu } from "@/components/site-mobile-menu";
 import { SiteNavLinks } from "@/components/site-nav-links";
 import { SignOutButton } from "@/components/sign-out-button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -30,7 +31,7 @@ export async function SiteNavbar() {
 
         <SiteNavLinks isSignedIn={isSignedIn} />
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="hidden shrink-0 items-center gap-2 sm:gap-3 md:flex">
           {isSignedIn ? (
             <>
               <div className="hidden text-right sm:block">
@@ -58,6 +59,15 @@ export async function SiteNavbar() {
             </>
           )}
           <ThemeToggle />
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <SiteMobileMenu
+            isSignedIn={isSignedIn}
+            userName={user?.name}
+            userEmail={user?.email}
+          />
         </div>
       </div>
     </header>

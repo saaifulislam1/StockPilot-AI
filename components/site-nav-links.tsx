@@ -5,12 +5,18 @@ import { usePathname } from "next/navigation";
 
 import { Icon } from "@/components/app-icons";
 
-const links = [
+export const siteNavLinks = [
   { href: "/", label: "Home", icon: "brand" as const },
   { href: "/new-research", label: "New Research", icon: "spark" as const },
   { href: "/saved-products", label: "Saved Research", icon: "list" as const },
   { href: "/operations", label: "Operations", icon: "chart" as const },
 ];
+
+export function getVisibleSiteNavLinks(isSignedIn: boolean) {
+  return siteNavLinks.filter((link) =>
+    isSignedIn ? true : link.href !== "/saved-products" && link.href !== "/operations",
+  );
+}
 
 export function SiteNavLinks({
   isSignedIn,
@@ -18,9 +24,7 @@ export function SiteNavLinks({
   isSignedIn: boolean;
 }) {
   const pathname = usePathname();
-  const visibleLinks = links.filter((link) =>
-    isSignedIn ? true : link.href !== "/saved-products" && link.href !== "/operations",
-  );
+  const visibleLinks = getVisibleSiteNavLinks(isSignedIn);
 
   return (
     <nav className="hidden items-center gap-2 md:flex">
