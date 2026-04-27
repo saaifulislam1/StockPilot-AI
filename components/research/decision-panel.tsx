@@ -14,6 +14,12 @@ import { type CompetitorEntry, getAdjustedPrice } from "@/lib/product-research";
 type DecisionPanelProps = {
   competitors: CompetitorEntry[];
   model: ReturnType<typeof import("@/lib/product-research").computeResearchModel>;
+  targetProfitSimulation?: {
+    value: number;
+    min: number;
+    max: number;
+    onChange: (value: number) => void;
+  };
   onSave?: () => void;
   onBack?: () => void;
   saveLabel?: string;
@@ -65,6 +71,7 @@ function getResearchActionIconName(label: string) {
 export function DecisionPanel({
   competitors,
   model,
+  targetProfitSimulation,
   onSave,
   onBack,
   saveLabel = "Save Research",
@@ -88,6 +95,17 @@ export function DecisionPanel({
         hasData,
       )}`
     : ready(model.product.buyingCostPerUnit, hasData);
+  const simulationProgress = targetProfitSimulation
+    ? Math.min(
+        100,
+        Math.max(
+          0,
+          ((targetProfitSimulation.value - targetProfitSimulation.min) /
+            Math.max(targetProfitSimulation.max - targetProfitSimulation.min, 1)) *
+            100,
+        ),
+      )
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -109,6 +127,68 @@ export function DecisionPanel({
           ) : null
         }
       >
+        {targetProfitSimulation ? (
+          <div className="mb-5 rounded-[1.25rem] border border-[var(--border)] bg-[linear-gradient(135deg,var(--surface-raised),var(--surface))] p-4 shadow-[var(--shadow-soft)]">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted)]">
+                  Profit simulation
+                </p>
+                <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+                  Drag to simulate target profit per order and recalculate this
+                  product plan.
+                </p>
+              </div>
+              <div className="grid min-w-[13rem] grid-cols-[1fr_auto] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-soft)]">
+                <label className="sr-only" htmlFor="target-profit-simulation">
+                  Target profit per order
+                </label>
+                <input
+                  id="target-profit-simulation"
+                  type="number"
+                  min={targetProfitSimulation.min}
+                  max={targetProfitSimulation.max}
+                  step={10}
+                  value={targetProfitSimulation.value}
+                  onChange={(event) =>
+                    targetProfitSimulation.onChange(Number(event.target.value))
+                  }
+                  className="min-w-0 border-0 bg-transparent px-3 py-2 text-right text-base font-semibold text-[var(--text)] outline-none"
+                />
+                <span className="border-l border-[var(--border)] px-3 py-2 text-sm font-medium text-[var(--muted)]">
+                  BDT
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <input
+                type="range"
+                min={targetProfitSimulation.min}
+                max={targetProfitSimulation.max}
+                step={10}
+                value={targetProfitSimulation.value}
+                onChange={(event) =>
+                  targetProfitSimulation.onChange(Number(event.target.value))
+                }
+                aria-label="Target profit per order"
+                className="profit-simulation-range w-full"
+                style={{
+                  background: `linear-gradient(90deg, var(--accent) ${simulationProgress}%, var(--surface-muted) ${simulationProgress}%)`,
+                }}
+              />
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted)]">
+              <span>{formatCurrency(targetProfitSimulation.min)}</span>
+              <span className="font-medium text-[var(--accent-strong)]">
+                Recommended sell price: {ready(model.pricing.recommendedSellPrice, hasData)}
+              </span>
+              <span>{formatCurrency(targetProfitSimulation.max)}</span>
+            </div>
+          </div>
+        ) : null}
+
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
           <MetricTile
             label="Buying Cost Per Unit"

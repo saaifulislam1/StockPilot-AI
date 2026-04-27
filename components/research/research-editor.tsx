@@ -50,6 +50,13 @@ type UpdateResearchResponse = {
   savedAt: string;
 };
 
+type SaveFeedback =
+  | {
+      tone: "error" | "success";
+      message: string;
+    }
+  | null;
+
 function getResearchActionIconName(label: string) {
   return label.toLowerCase().includes("update") ? "sync" : "bookmark";
 }
@@ -245,20 +252,41 @@ export function ResearchEditor({
   const [savedCompetitors, setSavedCompetitors] = useState<CompetitorEntry[]>(
     ensureCompetitorIds(initialDataset.competitors),
   );
+  const [simulatedTargetProfit, setSimulatedTargetProfit] = useState(
+    initialProduct.targetNetProfitPerOrder,
+  );
+  const [saveFeedback, setSaveFeedback] = useState<SaveFeedback>(null);
   const [showStopEditModal, setShowStopEditModal] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const inputMode = mode === "create" || isEditing;
+  const simulationMax =
+    Math.ceil(
+      Math.max(
+        10000,
+        product.buyingCostPerUnit * 5,
+        savedProduct.targetNetProfitPerOrder * 4,
+        initialProduct.targetNetProfitPerOrder * 4,
+      ) / 100,
+    ) * 100;
+  const simulatedProduct = useMemo(
+    () => ({
+      ...product,
+      targetNetProfitPerOrder: simulatedTargetProfit,
+    }),
+    [product, simulatedTargetProfit],
+  );
 
   const model = useMemo(
     () =>
       computeResearchModel(
         {
-          product,
+          product: simulatedProduct,
           competitors,
           salesLog: initialDataset.salesLog,
         },
-        product.unitsBought,
+        simulatedProduct.unitsBought,
       ),
-    [competitors, initialDataset.salesLog, product],
+    [competitors, initialDataset.salesLog, simulatedProduct],
   );
   const productValidation = useMemo(
     () => validateProductInputs(product, productDrafts),
@@ -283,14 +311,20 @@ export function ResearchEditor({
   }
 
   function updateProductNumber(key: ProductNumberKey, value: string) {
+    const parsedValue = parseNumericInput(value);
+
     setProductDrafts((current) => ({
       ...current,
       [key]: value,
     }));
     setProduct((current) => ({
       ...current,
-      [key]: parseNumericInput(value),
+      [key]: parsedValue,
     }));
+
+    if (key === "targetNetProfitPerOrder") {
+      setSimulatedTargetProfit(parsedValue);
+    }
   }
 
   function updateFailedOrderRate(value: string) {
@@ -329,8 +363,14 @@ export function ResearchEditor({
 
   function saveResearch() {
     if (!canContinue) {
+      setSaveFeedback({
+        tone: "error",
+        message: "Complete the required fields before saving this research.",
+      });
       return;
     }
+
+    setSaveFeedback(null);
 
     startTransition(async () => {
       try {
@@ -348,6 +388,10 @@ export function ResearchEditor({
               "Content-Type": "application/json",
             },
             body: JSON.stringify(payload),
+          });
+          setSaveFeedback({
+            tone: "success",
+            message: "Research saved. Opening the saved record.",
           });
           router.push(`/saved-products/${result.id}`);
           router.refresh();
@@ -369,18 +413,48 @@ export function ResearchEditor({
         setSavedProductDrafts(createProductFieldDrafts(product));
         setSavedCompetitors(ensureCompetitorIds(normalizedCompetitors));
         setCompetitors(ensureCompetitorIds(normalizedCompetitors));
+        setSimulatedTargetProfit(product.targetNetProfitPerOrder);
         setShowStopEditModal(false);
         setIsEditing(false);
         setStep("analysis");
+        setSaveFeedback({
+          tone: "success",
+          message: "Research updated.",
+        });
         router.refresh();
-      } catch {
+      } catch (error) {
+        setSaveFeedback({
+          tone: "error",
+          message:
+            error instanceof Error ? error.message : "Unable to save research right now.",
+        });
       }
     });
   }
 
-  const inputMode = mode === "create" || isEditing;
   const showInputs = inputMode && step === "inputs";
   const showAnalysis = !inputMode || step === "analysis";
+
+  function updateSimulatedTargetProfit(value: number) {
+    const nextValue = Math.min(
+      simulationMax,
+      Math.max(0, Math.round(Number.isFinite(value) ? value : 0)),
+    );
+    setSimulatedTargetProfit(nextValue);
+
+    if (!inputMode) {
+      return;
+    }
+
+    setProduct((current) => ({
+      ...current,
+      targetNetProfitPerOrder: nextValue,
+    }));
+    setProductDrafts((current) => ({
+      ...current,
+      targetNetProfitPerOrder: String(nextValue),
+    }));
+  }
 
   function reviewAnalysis() {
     if (!canContinue) {
@@ -419,6 +493,7 @@ export function ResearchEditor({
     setProduct(savedProduct);
     setProductDrafts(savedProductDrafts);
     setCompetitors(savedCompetitors);
+    setSimulatedTargetProfit(savedProduct.targetNetProfitPerOrder);
     setShowStopEditModal(false);
     setIsEditing(false);
     setStep("analysis");
@@ -426,6 +501,18 @@ export function ResearchEditor({
 
   return (
     <div className="space-y-6">
+      {saveFeedback ? (
+        <div
+          className={`rounded-[1.25rem] border px-4 py-3 text-sm font-medium ${
+            saveFeedback.tone === "error"
+              ? "border-rose-200 bg-rose-50 text-rose-700"
+              : "border-emerald-200 bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {saveFeedback.message}
+        </div>
+      ) : null}
+
       <div className="grid gap-6">
         {inputMode ? (
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4 sm:px-5">
@@ -588,6 +675,12 @@ export function ResearchEditor({
           <DecisionPanel
             competitors={competitors}
             model={model}
+            targetProfitSimulation={{
+              value: simulatedTargetProfit,
+              min: 0,
+              max: simulationMax,
+              onChange: updateSimulatedTargetProfit,
+            }}
             onBack={inputMode ? () => setStep("inputs") : undefined}
             onSave={inputMode ? saveResearch : undefined}
             saveLabel={

@@ -173,8 +173,8 @@ export function CompetitorSection({
               <span>Competitor</span>
               <span>Channel</span>
               <span>Listed Price</span>
-              <span>Delivery Fee</span>
               <span>Notes</span>
+              <span>Delivery Fee</span>
               <span>Product Page Links</span>
               <span>Action</span>
             </div>
@@ -232,6 +232,14 @@ export function CompetitorSection({
                     }
                   />
                   <input
+                    className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 text-sm text-[var(--text)] shadow-[var(--shadow-soft)]"
+                    value={entry.notes ?? ""}
+                    placeholder="Observed market price"
+                    onChange={(event) =>
+                      onUpdateCompetitor(index, "notes", event.target.value)
+                    }
+                  />
+                  <input
                     type="number"
                     className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 text-sm text-[var(--text)] shadow-[var(--shadow-soft)]"
                     value={entry.customDeliveryFee === 0 ? "" : entry.customDeliveryFee}
@@ -242,14 +250,6 @@ export function CompetitorSection({
                         "customDeliveryFee",
                         Number(event.target.value),
                       )
-                    }
-                  />
-                  <input
-                    className="h-10 min-w-0 rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 text-sm text-[var(--text)] shadow-[var(--shadow-soft)]"
-                    value={entry.notes ?? ""}
-                    placeholder="Observed market price"
-                    onChange={(event) =>
-                      onUpdateCompetitor(index, "notes", event.target.value)
                     }
                   />
                   <ProductLinksField

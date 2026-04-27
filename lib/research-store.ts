@@ -139,6 +139,10 @@ function channelValue(value: unknown): Channel {
     : "Website";
 }
 
+function jsonbValue(value: unknown) {
+  return JSON.stringify(value);
+}
+
 function normalizeStoredCompetitors(value: CompetitorEntry[] | string | null) {
   return parseJsonArray<Record<string, unknown>>(value).map((entry) => ({
     id: typeof entry.id === "string" ? entry.id : undefined,
@@ -201,9 +205,9 @@ export async function createResearchDataset(
     values (
       ${id},
       ${userId},
-      ${sql.json(input.product)}::jsonb,
-      ${sql.json(input.competitors)}::jsonb,
-      ${sql.json([])}::jsonb,
+      ${jsonbValue(input.product)}::jsonb,
+      ${jsonbValue(input.competitors)}::jsonb,
+      ${jsonbValue([])}::jsonb,
       ${input.scenarioUnitsSold}
     )
   `;
@@ -235,8 +239,8 @@ export async function updateResearchDataset(
   const rows = await sql`
     update product_researches
     set
-      product = ${sql.json(input.product)}::jsonb,
-      competitors = ${sql.json(input.competitors)}::jsonb,
+      product = ${jsonbValue(input.product)}::jsonb,
+      competitors = ${jsonbValue(input.competitors)}::jsonb,
       scenario_units_sold = ${input.scenarioUnitsSold},
       updated_at = now()
     where id = ${id}
