@@ -54,7 +54,7 @@ export function SiteMobileMenu({
       {isOpen ? (
         <div
           id="mobile-site-navigation"
-          className="absolute left-4 right-4 top-full mt-2 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-2 shadow-[0_18px_46px_rgba(15,23,42,0.18)]"
+          className="absolute right-4 top-full mt-2 w-[min(calc(100vw-2rem),22rem)] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-2 shadow-[0_18px_46px_rgba(15,23,42,0.18)]"
         >
           <nav className="grid gap-1" aria-label="Mobile navigation">
             {visibleLinks.map((link) => {

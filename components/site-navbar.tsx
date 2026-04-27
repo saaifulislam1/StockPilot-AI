@@ -14,7 +14,7 @@ export async function SiteNavbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[color:var(--surface-strong)]/90 shadow-[0_8px_26px_rgba(15,23,42,0.04)] backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-8 sm:py-4 lg:px-10">
+      <div className="mx-auto flex w-full  items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-8 sm:py-4 lg:px-10">
         <Link href="/" className="flex min-w-0 items-center gap-3">
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-raised)] p-2 text-[var(--text)] shadow-[var(--shadow-soft)] sm:p-2.5">
             <Icon name="brand" className="h-5 w-5" />

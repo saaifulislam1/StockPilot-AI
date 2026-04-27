@@ -225,11 +225,13 @@ export function MetricTile({
   value,
   hint,
   icon,
+  valueVariant = "metric",
 }: {
   label: string;
   value: string;
   hint: React.ReactNode;
   icon?: React.ReactNode;
+  valueVariant?: "metric" | "badge";
 }) {
   return (
     <article className="rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-soft)] sm:rounded-[1.5rem] sm:p-5">
@@ -241,9 +243,20 @@ export function MetricTile({
           <span className="text-[var(--accent-strong)]">{icon}</span>
         ) : null}
       </div>
-      <p className="mt-3 text-[2rem] font-semibold tracking-tight text-[var(--text)] sm:text-3xl">
-        {value}
-      </p>
+      {valueVariant === "badge" ? (
+        <div className="mt-3">
+          <span
+            className={`inline-flex max-w-full items-start rounded-lg border px-2.5 py-1 text-left text-xs font-semibold leading-4 ${getTone(value)}`}
+            style={getToneTextStyle(value)}
+          >
+            {value}
+          </span>
+        </div>
+      ) : (
+        <p className="mt-3 text-[2rem] font-semibold tracking-tight text-[var(--text)] sm:text-3xl">
+          {value}
+        </p>
+      )}
       <div className="mt-2 text-sm leading-6 text-[var(--muted)]">{hint}</div>
     </article>
   );

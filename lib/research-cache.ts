@@ -9,12 +9,12 @@ export function savedResearchTag(userId: string, id: string) {
 }
 
 export function revalidateSavedResearches(userId: string) {
-  revalidateTag(savedResearchesTag(userId), "max");
+  revalidateTag(savedResearchesTag(userId), { expire: 0 });
   revalidatePath("/saved-products");
 }
 
 export function revalidateSavedResearch(userId: string, id: string) {
-  revalidateTag(savedResearchTag(userId, id), "max");
+  revalidateTag(savedResearchTag(userId, id), { expire: 0 });
   revalidatePath(`/saved-products/${id}`);
 }
 

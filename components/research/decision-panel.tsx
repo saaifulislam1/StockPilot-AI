@@ -187,6 +187,7 @@ export function DecisionPanel({
           <MetricTile
             label="Profit Status"
             value={model.pricing.profitStatus}
+            valueVariant="badge"
             hint="Quick read on margin strength at the current assumptions."
           />
         </div>
@@ -361,7 +362,7 @@ export function DecisionPanel({
                     </p>
                   </div>
                   <span
-                    className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(model.pricing.profitStatus)}`}
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-semibold leading-4 ${getTone(model.pricing.profitStatus)}`}
                     style={getToneTextStyle(model.pricing.profitStatus)}
                   >
                     {model.pricing.profitStatus}
@@ -418,13 +419,13 @@ export function DecisionPanel({
 
                 <div className="mt-5 flex flex-wrap gap-3">
                   <span
-                    className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(model.pricing.breakEvenAlert)}`}
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-semibold leading-4 ${getTone(model.pricing.breakEvenAlert)}`}
                     style={getToneTextStyle(model.pricing.breakEvenAlert)}
                   >
                     {model.pricing.breakEvenAlert}
                   </span>
                   <span
-                    className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(model.pricing.restockDecision)}`}
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-semibold leading-4 ${getTone(model.pricing.restockDecision)}`}
                     style={getToneTextStyle(model.pricing.restockDecision)}
                   >
                     {model.pricing.restockDecision}
@@ -731,7 +732,7 @@ export function DecisionPanel({
                         </p>
                       </div>
                       <span
-                        className={`rounded-full border px-3 py-1 text-sm font-medium ${getTone(
+                        className={`rounded-lg border px-2.5 py-1 text-xs font-semibold leading-4 ${getTone(
                           scenario.verdict,
                         )}`}
                         style={getToneTextStyle(scenario.verdict)}

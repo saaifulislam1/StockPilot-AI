@@ -8,6 +8,7 @@ import {
 } from "@/lib/research-cache";
 import {
   type CompetitorEntry,
+  type Channel,
   type ProductInputs,
   type ResearchDataset,
   type SalesEntry,
@@ -112,6 +113,50 @@ function parseJsonObject<T extends object>(value: T | string | null | undefined)
   return {} as T;
 }
 
+function numberValue(value: unknown, fallback = 0) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
+  return fallback;
+}
+
+function stringValue(value: unknown, fallback = "") {
+  return typeof value === "string" ? value : fallback;
+}
+
+function channelValue(value: unknown): Channel {
+  return value === "Facebook" ||
+    value === "Marketplace" ||
+    value === "Retail" ||
+    value === "Website"
+    ? value
+    : "Website";
+}
+
+function normalizeStoredCompetitors(value: CompetitorEntry[] | string | null) {
+  return parseJsonArray<Record<string, unknown>>(value).map((entry) => ({
+    id: typeof entry.id === "string" ? entry.id : undefined,
+    date: stringValue(entry.date, new Date().toISOString().slice(0, 10)),
+    competitor: stringValue(entry.competitor),
+    productLinks: Array.isArray(entry.productLinks)
+      ? entry.productLinks.filter((link): link is string => typeof link === "string")
+      : typeof entry.productUrl === "string"
+        ? [entry.productUrl]
+        : [],
+    productUrl: stringValue(entry.productUrl),
+    channel: channelValue(entry.channel),
+    listedPrice: numberValue(entry.listedPrice),
+    customDeliveryFee: numberValue(entry.customDeliveryFee),
+    notes: stringValue(entry.notes),
+  }));
+}
+
 export async function loadResearchDataset(): Promise<ResearchDataset> {
   const sql = getSql();
   if (!sql) {
@@ -125,7 +170,7 @@ function mapRowToDataset(row: WorkspaceRow): ResearchDataset {
   return withStorage(
     {
       product: normalizeProductInputs(parseJsonObject<ProductInputs>(row.product)),
-      competitors: parseJsonArray<CompetitorEntry>(row.competitors),
+      competitors: normalizeStoredCompetitors(row.competitors),
       salesLog: parseJsonArray<SalesEntry>(row.sales_log),
       scenarioUnitsSold: row.scenario_units_sold,
     },
