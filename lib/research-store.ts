@@ -1,4 +1,5 @@
 import { getSql } from "@/lib/db";
+import { ensureDatabaseSchema } from "@/lib/db-migrate";
 import { cacheLife, cacheTag } from "next/cache";
 import { ensureAuthTables } from "@/lib/auth-store";
 import {
@@ -43,81 +44,14 @@ export type SavedResearchSummary = {
 let workspaceTablePromise: Promise<ReturnType<typeof getSql>> | null = null;
 
 async function initWorkspaceTable() {
+  await ensureDatabaseSchema();
+
   const sql = getSql();
   if (!sql) {
     return null;
   }
 
   await ensureAuthTables();
-
-  await sql`
-    create table if not exists product_researches (
-      id text primary key,
-      product jsonb not null,
-      competitors jsonb not null default '[]'::jsonb,
-      sales_log jsonb not null default '[]'::jsonb,
-      scenario_units_sold integer not null default 0,
-      created_at timestamptz not null default now(),
-      updated_at timestamptz not null default now()
-    )
-  `;
-
-  await sql`
-    alter table product_researches
-    add column if not exists user_id text
-  `;
-
-  await sql`
-    update product_researches
-    set product = (product #>> '{}')::jsonb
-    where jsonb_typeof(product) = 'string'
-      and left(product #>> '{}', 1) = '{'
-  `;
-
-  await sql`
-    update product_researches
-    set competitors = (competitors #>> '{}')::jsonb
-    where jsonb_typeof(competitors) = 'string'
-      and left(competitors #>> '{}', 1) = '['
-  `;
-
-  await sql`
-    update product_researches
-    set sales_log = (sales_log #>> '{}')::jsonb
-    where jsonb_typeof(sales_log) = 'string'
-      and left(sales_log #>> '{}', 1) = '['
-  `;
-
-  await sql`
-    delete from product_researches
-    where user_id is not null
-      and not exists (
-        select 1
-        from app_users
-        where app_users.id = product_researches.user_id
-      )
-  `;
-
-  await sql`
-    do $$
-    begin
-      if not exists (
-        select 1
-        from pg_constraint
-        where conname = 'product_researches_user_id_fkey'
-      ) then
-        alter table product_researches
-        add constraint product_researches_user_id_fkey
-        foreign key (user_id) references app_users(id) on delete cascade;
-      end if;
-    end
-    $$;
-  `;
-
-  await sql`
-    create index if not exists product_researches_user_idx
-    on product_researches(user_id, updated_at desc)
-  `;
 
   return sql;
 }

@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 
 import { hashPassword } from "@/lib/auth-crypto";
+import { ensureDatabaseSchema } from "@/lib/db-migrate";
 import { getSql } from "@/lib/db";
 
 export type AppUser = {
@@ -36,39 +37,12 @@ function normalizeEmail(email: string) {
 }
 
 async function initAuthTables() {
+  await ensureDatabaseSchema();
+
   const sql = getSql();
   if (!sql) {
     return null;
   }
-
-  await sql`
-    create table if not exists app_users (
-      id text primary key,
-      email text not null unique,
-      name text,
-      password_hash text not null,
-      email_verified_at timestamptz,
-      created_at timestamptz not null default now(),
-      updated_at timestamptz not null default now()
-    )
-  `;
-
-  await sql`
-    create table if not exists auth_tokens (
-      id text primary key,
-      user_id text not null references app_users(id) on delete cascade,
-      email text not null,
-      token_hash text not null unique,
-      type text not null,
-      expires_at timestamptz not null,
-      created_at timestamptz not null default now()
-    )
-  `;
-
-  await sql`
-    create index if not exists auth_tokens_user_type_idx
-    on auth_tokens(user_id, type)
-  `;
 
   return sql;
 }

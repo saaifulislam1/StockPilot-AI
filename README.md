@@ -21,7 +21,9 @@ The research flow remains a dedicated decision layer for competitor tracking, pr
 
 ## Local development database
 
-Local development uses Docker PostgreSQL.
+Local development uses Docker PostgreSQL, and schema changes are managed with Drizzle Kit migrations.
+
+For the full database workflow, safety rules, and local-vs-production guidance, see [README.database.md](/Users/saifulislamrifat/Desktop/projects/product-research/README.database.md).
 
 1. Copy env values from `.env.example` if needed.
 2. Start the local database:
@@ -30,13 +32,19 @@ Local development uses Docker PostgreSQL.
 npm run db:up
 ```
 
-3. Start the app:
+3. Apply the current schema:
+
+```bash
+npm run db:migrate
+```
+
+4. Start the app:
 
 ```bash
 npm run dev
 ```
 
-4. Stop the database when finished:
+5. Stop the database when finished:
 
 ```bash
 npm run db:down
@@ -71,4 +79,7 @@ npm run lint
 npm run db:up
 npm run db:down
 npm run db:logs
+npm run db:generate
+npm run db:migrate
+npm run db:studio
 ```

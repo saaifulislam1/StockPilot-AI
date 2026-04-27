@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { ensureAuthTables } from "@/lib/auth-store";
 import { getSql } from "@/lib/db";
+import { ensureDatabaseSchema } from "@/lib/db-migrate";
 
 export type BusinessProduct = {
   id: string;
@@ -222,101 +223,14 @@ function mapInventoryAdjustment(row: InventoryAdjustmentRow): InventoryAdjustmen
 }
 
 async function initBusinessTables() {
+  await ensureDatabaseSchema();
+
   const sql = getSql();
   if (!sql) {
     return null;
   }
 
   await ensureAuthTables();
-
-  await sql`
-    create table if not exists business_products (
-      id text primary key,
-      user_id text not null references app_users(id) on delete cascade,
-      name text not null,
-      sku text not null default '',
-      supplier text not null default '',
-      status text not null default 'researching',
-      target_sell_price integer not null default 0,
-      reorder_point integer not null default 0,
-      on_hand_units integer not null default 0,
-      sold_units integer not null default 0,
-      returned_units integer not null default 0,
-      linked_research_id text,
-      notes text not null default '',
-      created_at timestamptz not null default now(),
-      updated_at timestamptz not null default now()
-    )
-  `;
-
-  await sql`
-    create index if not exists business_products_user_idx
-    on business_products(user_id, updated_at desc)
-  `;
-
-  await sql`
-    create table if not exists purchase_orders (
-      id text primary key,
-      user_id text not null references app_users(id) on delete cascade,
-      product_id text not null references business_products(id) on delete cascade,
-      supplier text not null default '',
-      status text not null default 'planned',
-      units integer not null default 0,
-      unit_cost integer not null default 0,
-      shipping_cost integer not null default 0,
-      ordered_at timestamptz not null default now(),
-      expected_at timestamptz,
-      note text not null default '',
-      created_at timestamptz not null default now(),
-      updated_at timestamptz not null default now()
-    )
-  `;
-
-  await sql`
-    create index if not exists purchase_orders_user_idx
-    on purchase_orders(user_id, ordered_at desc)
-  `;
-
-  await sql`
-    create table if not exists sales_logs (
-      id text primary key,
-      user_id text not null references app_users(id) on delete cascade,
-      product_id text not null references business_products(id) on delete cascade,
-      channel text not null default 'facebook',
-      status text not null default 'delivered',
-      quantity integer not null default 1,
-      sell_price integer not null default 0,
-      delivery_cost integer not null default 0,
-      ad_spend integer not null default 0,
-      packaging_cost integer not null default 0,
-      platform_fee integer not null default 0,
-      sold_at timestamptz not null default now(),
-      note text not null default '',
-      created_at timestamptz not null default now()
-    )
-  `;
-
-  await sql`
-    create index if not exists sales_logs_user_idx
-    on sales_logs(user_id, sold_at desc)
-  `;
-
-  await sql`
-    create table if not exists inventory_adjustments (
-      id text primary key,
-      user_id text not null references app_users(id) on delete cascade,
-      product_id text not null references business_products(id) on delete cascade,
-      delta_units integer not null,
-      reason text not null,
-      note text not null default '',
-      created_at timestamptz not null default now()
-    )
-  `;
-
-  await sql`
-    create index if not exists inventory_adjustments_user_idx
-    on inventory_adjustments(user_id, created_at desc)
-  `;
 
   return sql;
 }
